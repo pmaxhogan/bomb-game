@@ -3,10 +3,12 @@ const ctxs = Array.from(canvases).map(canvas => canvas.getContext("2d"));
 
 let speed = 2.5;
 
+const frameAdj = 1;
 const width = 100;
 const height = 100;
 const bulletSize = 5;
 const bulletSpeed = 20;
+let frame = 0;
 
 onresize = () => {
   canvases.forEach(canvas => canvas.setAttribute("width", (innerWidth / 2 - 10).toString()));
@@ -23,10 +25,14 @@ const log = (...args) => {
 };
 
 onkeydown = e => {
+  e.preventDefault();
   keys[e.code] = true;
+  return false;
 };
 onkeyup = e => {
+  e.preventDefault();
   delete keys[e.code];
+  return false;
 };
 
 const isCollision = (rect1, rect2) => {
@@ -398,9 +404,25 @@ const drawNoise = (x, y, w, h, density) => {
 };
 
 drawBorder(0, 0, width, height);
-drawNoise(1, 1, width - 2, height - 2, 0.2);
+drawNoise(1, 2, width - 2, height - 2, 0.2);
 
 const bullets = [];
+
+const noop = () => {};
+const fakeCtx = {
+  fillRect: noop,
+  fillStyle: noop,
+  beginPath: noop,
+  arc: noop,
+  fill: noop,
+  save: noop,
+  translate: noop,
+  restore: noop,
+  canvas: {
+    offsetWidth: 0,
+    offsetHeight: 0
+  }
+};
 
 const draw = () => {
   if(isRunning){
@@ -408,6 +430,9 @@ const draw = () => {
   }
   isRunning = true;
   ctxs.forEach((ctx, id) => {
+    if(frame % frameAdj !== 0){
+      ctx = fakeCtx;
+    }
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, 10000, 10000);
     if(!players[id]) return;
@@ -422,6 +447,8 @@ const draw = () => {
   });
 
   isRunning = false;
+
+  frame ++;
 };
 
 setInterval(draw, 1000 / 60);
