@@ -1,22 +1,11 @@
 #!/usr/bin/env node
 
-const canvases = document.querySelectorAll("canvas");
-const ctxs = Array.from(canvases).map(canvas => canvas.getContext("2d"));
-
 let speed = 2.5;
 
-const frameAdj = 1;
 const width = 100;
 const height = 100;
 const bulletSize = 5;
 const bulletSpeed = 5;
-let frame = 0;
-
-onresize = () => {
-  canvases.forEach(canvas => canvas.setAttribute("width", (innerWidth / 2 - 10).toString()));
-  canvases.forEach(canvas => canvas.setAttribute("height", innerHeight.toString()));
-};
-onresize();
 
 const keys = {};
 const doLog = false;
@@ -153,11 +142,6 @@ class Player {
     }
   }
   kill(){
-    if(ctxs.length === 1){
-      ctxs.pop();
-    }else{
-      ctxs.splice(ctxs[this.idx], 1);
-    }
     // alert("RIP " + this.fillColor);
     if(players.length === 1){
       players.pop();
@@ -452,47 +436,19 @@ onkeypress = e => {
   return false;
 };
 
-const noop = () => {};
-const fakeCtx = {
-  fillRect: noop,
-  fillStyle: noop,
-  beginPath: noop,
-  arc: noop,
-  fill: noop,
-  save: noop,
-  translate: noop,
-  restore: noop,
-  canvas: {
-    offsetWidth: 0,
-    offsetHeight: 0
-  }
-};
-
 const draw = () => {
   if(isRunning){
     throw new Error("OOF");
   }
   isRunning = true;
-  ctxs.forEach((ctx, id) => {
-    if(frame % frameAdj !== 0){
-      ctx = fakeCtx;
-    }
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, 10000, 10000);
-    if(!players[id] || players[id].isDead) return;
 
-    ctx.save();
-    ctx.translate(Math.round(-(players[id].x + (players[id].width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(players[id].y + (players[id].height / 2) - (ctx.canvas.offsetHeight / 2))));
-    players.forEach(player => player.draw(ctx));
-    blocks.forEach(block => block.draw(ctx));
-    bullets.forEach(bullet => bullet.draw(ctx));
-    Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
-    ctx.restore();
-  });
+  // ctx.translate(Math.round(-(players[id].x + (players[id].width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(players[id].y + (players[id].height / 2) - (ctx.canvas.offsetHeight / 2))));
+  players.forEach(player => player.draw());
+  blocks.forEach(block => block.draw());
+  bullets.forEach(bullet => bullet.draw());
+  Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
 
   isRunning = false;
-
-  frame ++;
 };
 
 setInterval(draw, 1000 / 60);
