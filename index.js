@@ -24,12 +24,17 @@ const log = (...args) => {
   }
 };
 
-onkeydown = e => {
+oncontextmenu = e => {
+  e.preventDefault();
+  return false;
+};
+
+document.onkeydown = e => {
   e.preventDefault();
   keys[e.code] = true;
   return false;
 };
-onkeyup = e => {
+document.onkeyup = e => {
   e.preventDefault();
   delete keys[e.code];
   return false;
@@ -152,7 +157,7 @@ class Player {
       players.splice(players.indexOf(this), 1);
     }
   }
-  ifKeyPressed(key) {
+  onKeyDown(key) {
     switch (key) {
     case this.controls.up:
       this.direction = "up";
@@ -170,6 +175,12 @@ class Player {
       this.direction = "right";
       this.x+=speed;
       break;
+    }
+  }
+
+  onKeyPress(key){
+    console.log(key);
+    switch(key){
     case this.controls.shoot:
       bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
     }
@@ -343,10 +354,8 @@ map.split("\n").forEach((line, lineNumber) => {
 
 const players = [
   new Player(
-    // (width - 2) * blockWidth,
-    // (height - 2) * blockWidth,
-    blockWidth * 2,
-    blockWidth * 2,
+    (width - 2) * blockWidth,
+    (height - 2) * blockWidth,
     blockWidth,
     blockWidth,
     {
@@ -369,7 +378,7 @@ const players = [
       down: "ArrowDown",
       left: "ArrowLeft",
       right: "ArrowRight",
-      shoot: "ControlRight"
+      shoot: "ShiftRight"
     },
     "blue",
     1
@@ -403,10 +412,25 @@ const drawNoise = (x, y, w, h, density) => {
   }
 };
 
+// for(var x = 0; x < width; x ++){
+//   for(var y = 0; y < height; y ++){
+//     if(playerCollisionCheck({
+//       collisionBoxes: [[x * blockWidth, y * blockWidth, (x + 1) * blockWidth, (y + 1) * blockWidth]]
+//     }, blocks)){
+//
+//     }
+// }
+// }
+
 drawBorder(0, 0, width, height);
-drawNoise(1, 2, width - 2, height - 2, 0.2);
+drawNoise(1, 1, width - 2, height - 2, 0.2);
 
 const bullets = [];
+
+onkeypress = e => {
+  e.preventDefault();
+  return false;
+};
 
 const noop = () => {};
 const fakeCtx = {
@@ -442,7 +466,7 @@ const draw = () => {
     players.forEach(player => player.draw(ctx));
     blocks.forEach(block => block.draw(ctx));
     bullets.forEach(bullet => bullet.draw(ctx));
-    Object.keys(keys).forEach(key => players.forEach(player => player.ifKeyPressed(key)));
+    Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
     ctx.restore();
   });
 
