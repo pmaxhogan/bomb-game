@@ -7,7 +7,7 @@ const frameAdj = 1;
 const width = 100;
 const height = 100;
 const bulletSize = 5;
-const bulletSpeed = 20;
+const bulletSpeed = 1;
 let frame = 0;
 
 onresize = () => {
@@ -17,7 +17,7 @@ onresize = () => {
 onresize();
 
 const keys = {};
-const doLog = false;
+const doLog = true;
 const log = (...args) => {
   if(doLog/* && frame % 20 === 0*/){
     console.log(...args);// eslint-disable-line no-console
@@ -29,13 +29,14 @@ oncontextmenu = e => {
   return false;
 };
 
-document.onkeydown = e => {
+onkeydown = e => {
   e.preventDefault();
   keys[e.code] = true;
   return false;
 };
-document.onkeyup = e => {
+onkeyup = e => {
   e.preventDefault();
+  players.forEach(player => player.onKeyPress(e.code));
   delete keys[e.code];
   return false;
 };
@@ -179,9 +180,10 @@ class Player {
   }
 
   onKeyPress(key){
-    console.log(key);
+    log(key);
     switch(key){
     case this.controls.shoot:
+      log("shoot");
       bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
     }
   }
@@ -244,18 +246,20 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
   const collision = playerCollisionCheck(mapped, joined);
 
   if(collision){
-    // console.log(collision);
+    log(collision, bullet);
     if(typeof collision.idx === "number"){
       // console.warn(players.indexOf(bullet.player), collision.idx);
       if(players.indexOf(bullet.player) !== collision.idx){
         players[collision.idx].kill();
+        bullet.remove();
+        return newVal;
       }else{
         log("Bullet hit owner.");
       }
+    }else{
+      bullet.remove();
+      return newVal;
     }
-
-    bullet.remove();
-    return newVal;
   }
   if(isX){
     bullet.realX = newVal;
@@ -279,7 +283,12 @@ class Bullet {
     ctx.fillStyle = "gray";
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
+    log(this.x, this.y);
     ctx.fill();
+
+    if(this.x < -100 || this.y < -100 || this.x > width + 100  || this.y > height + 100){
+      return this.remove();
+    }
 
     switch(this.direction){
     case "up":
@@ -294,10 +303,13 @@ class Bullet {
     case "right":
       this.x += bulletSpeed;
       break;
+    default:
+      throw this;
     }
   }
 
   remove(){
+    log("remove");
     if(bullets.length === 1){
       bullets.pop();
     }else{
