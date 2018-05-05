@@ -237,6 +237,8 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
     });
   }
 
+  // mapped.forEach(x=>ctxs[0].fillRect(x[0], x[1], x[2], x[3]));
+
   let joined = [].concat(players/*.map((player, idx) => ({
     collisionBoxes: realCollisionBoxes(player),
     idx
@@ -246,7 +248,6 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
   const collision = playerCollisionCheck(mapped, joined);
 
   if(collision){
-    log(collision, bullet);
     if(typeof collision.idx === "number"){
       // console.warn(players.indexOf(bullet.player), collision.idx);
       if(players.indexOf(bullet.player) !== collision.idx){
@@ -286,7 +287,7 @@ class Bullet {
     log(this.x, this.y);
     ctx.fill();
 
-    if(this.x < -100 || this.y < -100 || this.x > width + 100  || this.y > height + 100){
+    if(this.x < -100 || this.y < -100 || this.x > (width * blockWidth) + 100  || this.y > (height * blockWidth) + 100){
       return this.remove();
     }
 
