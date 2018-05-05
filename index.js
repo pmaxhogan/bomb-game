@@ -7,7 +7,7 @@ const frameAdj = 1;
 const width = 100;
 const height = 100;
 const bulletSize = 5;
-const bulletSpeed = 1;
+const bulletSpeed = 5;
 let frame = 0;
 
 onresize = () => {
@@ -17,7 +17,7 @@ onresize = () => {
 onresize();
 
 const keys = {};
-const doLog = true;
+const doLog = false;
 const log = (...args) => {
   if(doLog/* && frame % 20 === 0*/){
     console.log(...args);// eslint-disable-line no-console
@@ -151,6 +151,11 @@ class Player {
     }
   }
   kill(){
+    if(ctxs.length === 1){
+      ctxs.pop();
+    }else{
+      ctxs.splice(ctxs[this.idx], 1);
+    }
     // alert("RIP " + this.fillColor);
     if(players.length === 1){
       players.pop();
@@ -472,7 +477,7 @@ const draw = () => {
     }
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, 10000, 10000);
-    if(!players[id]) return;
+    if(!players[id] || players[id].isDead) return;
 
     ctx.save();
     ctx.translate(Math.round(-(players[id].x + (players[id].width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(players[id].y + (players[id].height / 2) - (ctx.canvas.offsetHeight / 2))));
