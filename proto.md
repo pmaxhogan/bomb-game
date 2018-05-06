@@ -4,6 +4,8 @@
 
 Each character is represented by 6 bits.
 
+code|character
+--|--
 0|a
 1|b
 2|c
@@ -48,7 +50,20 @@ Each character is represented by 6 bits.
 3 bits
 0. pong (`000`)
 1. handshake / token / name (`001`)  
-  Bits after the first 3 are interpreted as a string based on the above code table, until the EOF character (`111111`) is sent. Note that each character in the string is represented by 6 bits. After the first EOF, a 2-dimensonal list of unique ids (13-bit numbers) and corresponding usernames will be sent. For example, `001010111111111`
+  Bits after the first 3 are interpreted as a string based on the above code table, until the EOF character (`111111`) is sent. Note that each character in the string is represented by 6 bits. After the first EOF, a 2-dimensonal list of unique ids (14-bit numbers) and corresponding usernames (EOF-terminated) will be sent. For example, `0010101111111110110000110000100101100111000101111111101110011001010001100000100001100000100` is parsed as below:
+
+handshake|username|EOF|user id|username|EOF|user id|username
+--|--|--
+`001`|`010111`|`111111`|`01100001100001`|`001011001110001011`|`111111`|`01110011001010`|`001100000100001100000100`
+handshake|xD|EOF|6421|lol|EOF|7370|meme
+
+  The list of other users and their ids shown above are also shown in the table below:
+
+id|name
+--|--
+[you]|xD
+6412|lol
+7370|meme
 
 2. killed (`010`)
 3. draw shapes (`011`)
