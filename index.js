@@ -438,6 +438,9 @@ onkeypress = e => {
 
 class FakeContext{
   constructor(){}
+  fillRect(x, y, width, height){
+    console.log("Draw rect", x, y, width, height);
+  }
 }
 
 const ctx = new FakeContext();
@@ -448,13 +451,11 @@ const draw = () => {
   }
   isRunning = true;
 
-  ctx.save();
   // ctx.translate(Math.round(-(players[id].x + (players[id].width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(players[id].y + (players[id].height / 2) - (ctx.canvas.offsetHeight / 2))));
   players.forEach(player => player.draw(ctx));
   blocks.forEach(block => block.draw(ctx));
   bullets.forEach(bullet => bullet.draw(ctx));
   Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
-  ctx.restore();
 
   isRunning = false;
 };
