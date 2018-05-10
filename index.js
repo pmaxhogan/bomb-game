@@ -436,17 +436,25 @@ onkeypress = e => {
   return false;
 };
 
+class FakeContext{
+  constructor(){}
+}
+
+const ctx = new FakeContext();
+
 const draw = () => {
   if(isRunning){
     throw new Error("OOF");
   }
   isRunning = true;
 
+  ctx.save();
   // ctx.translate(Math.round(-(players[id].x + (players[id].width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(players[id].y + (players[id].height / 2) - (ctx.canvas.offsetHeight / 2))));
-  players.forEach(player => player.draw());
-  blocks.forEach(block => block.draw());
-  bullets.forEach(bullet => bullet.draw());
+  players.forEach(player => player.draw(ctx));
+  blocks.forEach(block => block.draw(ctx));
+  bullets.forEach(bullet => bullet.draw(ctx));
   Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
+  ctx.restore();
 
   isRunning = false;
 };

@@ -67,6 +67,12 @@ id|name
 
 2. killed (`010`)
 3. draw shapes (`011`)
+  This is a list of blocks, bullets, and players to draw. Each has a fixed width, so no separating characters are necessary.
+  Shape selector: 2 bits
+  0. Block
+  1. Bullet
+  2. Player
+  3. Unused
 4. leaderboard (`100`)
 5. reserved (`101`)
 6. reserved (`110`)
