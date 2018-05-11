@@ -436,10 +436,12 @@ onkeypress = e => {
   return false;
 };
 
+let rects = [];
+
 class FakeContext{
   constructor(){}
   fillRect(x, y, width, height){
-    console.log("Draw rect", x, y, width, height);
+    rects.push([x, y, width, height]);
   }
 }
 
@@ -451,11 +453,14 @@ const draw = () => {
   }
   isRunning = true;
 
+  rects = [];
   // ctx.translate(Math.round(-(players[id].x + (players[id].width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(players[id].y + (players[id].height / 2) - (ctx.canvas.offsetHeight / 2))));
   players.forEach(player => player.draw(ctx));
   blocks.forEach(block => block.draw(ctx));
   bullets.forEach(bullet => bullet.draw(ctx));
   Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
+
+  console.log(rects);
 
   isRunning = false;
 };
