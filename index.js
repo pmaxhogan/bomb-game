@@ -460,12 +460,12 @@ const draw = () => {
   bullets.forEach(bullet => bullet.draw(ctx));
   Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
 
-  // console.log(rects);
-
   isRunning = false;
 };
 
 module.exports = () => {
   setInterval(draw, 1000 / 60);
-  return blocks.reduce((acc, block) => [block.x, block.y, block.width, block.height], []);
+  return {
+    map: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
+  };
 };

@@ -5,9 +5,9 @@ socket.onopen = () => {
   send({type: "hello", data: {}});
 };
 socket.onmessage = (e) => {
-  console.log("[socket] recieved data", e);
+  console.log("[socket] recieved data", e.data);
   try{
-    JSON.parse(e).forEach(data => {
+    JSON.parse(e.data).forEach(data => {
       try{
         switch(data.type){
         case "map":
@@ -25,6 +25,6 @@ socket.onmessage = (e) => {
   }
 };
 
-let send = data => {
-  socket.send(JSON.stringify([data]));
+const send = (...data) => {
+  socket.send(JSON.stringify(data));
 };

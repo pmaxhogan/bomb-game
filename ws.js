@@ -15,7 +15,9 @@ wss.broadcast = function broadcast(data) {
 };
 
 wss.on("connection", function connection(ws) {
-  ws.send("Oh hello there!");
+  const send = (...data) => {
+    ws.send(JSON.stringify(data));
+  };
   ws.on("message", function incoming(data) {
     console.log("[socket] recieved", data);
     try{
@@ -23,6 +25,7 @@ wss.on("connection", function connection(ws) {
         try{
           switch(data.type){
           case "hello":
+            send({type: "map", data: map});
             break;
           default:
             throw new Error("Unknown WS protocol type", data.type);
