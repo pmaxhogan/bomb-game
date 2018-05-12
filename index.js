@@ -466,6 +466,6 @@ const draw = () => {
 module.exports = () => {
   setInterval(draw, 1000 / 60);
   return {
-    map: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
+    blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
   };
 };

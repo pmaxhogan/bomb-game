@@ -1,3 +1,5 @@
+/* global game: false */
+
 console.log("hello world");
 let socket = new WebSocket("ws://localhost:8080");
 socket.onopen = () => {
@@ -12,6 +14,7 @@ socket.onmessage = (e) => {
         switch(data.type){
         case "map":
           console.log("got map", data.data);
+          game(data.data);
           break;
         default:
           throw new Error("Unknown WS protocol type", data.type);
