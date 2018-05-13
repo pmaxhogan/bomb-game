@@ -40,9 +40,8 @@ class Block {
     this.height = height;
     this.collisionBoxes = [[0, 0, width, height]];
   }
-  draw(ctx) {
-    ctx.fillStyle = this.fillColor || "black";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+  draw(){
+    // TODO: code here?
   }
 }
 
@@ -107,26 +106,8 @@ class Player {
     this.id = id;
     this.direction = "up";
   }
-  draw(ctx) {
-    ctx.fillStyle = this.fillColor || "black";
-    ctx.fillRect(this.x, this.y, this.width, this.height);
-
-    ctx.fillStyle = "gray";
-    const slice = 3;
-    switch(this.direction){
-    case "up":
-      ctx.fillRect(this.x, this.y, this.width, this.height / slice);
-      break;
-    case "down":
-      ctx.fillRect(this.x, this.y + (this.height - this.height / slice), this.width, this.height / slice);
-      break;
-    case "left":
-      ctx.fillRect(this.x, this.y, this.width / slice, this.height);
-      break;
-    case "right":
-      ctx.fillRect(this.x + (this.width - this.width / slice), this.y, this.width / slice, this.height);
-      break;
-    }
+  draw() {
+    // TODO: add code?
   }
   kill(){
     // alert("RIP " + this.fillColor);
@@ -213,8 +194,6 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
     });
   }
 
-  // mapped.forEach(x=>ctxs[0].fillRect(x[0], x[1], x[2], x[3]));
-
   let joined = [].concat(players/*.map((player, idx) => ({
     collisionBoxes: realCollisionBoxes(player),
     idx
@@ -256,13 +235,7 @@ class Bullet {
     this.collisionBoxes = [[-this.size / 2, -this.size / 2, this.size / 2, this.size / 2]];
     this.player = player;
   }
-  draw(ctx){
-    ctx.fillStyle = "gray";
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, true);
-    log(this.x, this.y);
-    ctx.fill();
-
+  draw(){
     if(this.x < -100 || this.y < -100 || this.x > (width * blockWidth) + 100  || this.y > (height * blockWidth) + 100){
       return this.remove();
     }
@@ -390,28 +363,15 @@ onkeypress = e => {
   return false;
 };
 
-let rects = [];
-
-class FakeContext{
-  constructor(){}
-  fillRect(x, y, width, height){
-    rects.push([x, y, width, height]);
-  }
-}
-
-const ctx = new FakeContext();
-
 const draw = () => {
   if(isRunning){
     throw new Error("OOF");
   }
   isRunning = true;
 
-  rects = [];
-  // ctx.translate(Math.round(-(players[id].x + (players[id].width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(players[id].y + (players[id].height / 2) - (ctx.canvas.offsetHeight / 2))));
-  players.forEach(player => player.draw(ctx));
-  blocks.forEach(block => block.draw(ctx));
-  bullets.forEach(bullet => bullet.draw(ctx));
+  players.forEach(player => player.draw());
+  blocks.forEach(block => block.draw());
+  bullets.forEach(bullet => bullet.draw());
 
   isRunning = false;
 };
