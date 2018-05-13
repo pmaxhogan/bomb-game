@@ -432,5 +432,5 @@ mainEmitter.on("ready", () => {
 
 mainEmitter.on("newUser", id => {
   console.log("new user", id);
-  players.push(new Player());
+  players.push(new Player(blockWidth, blockWidth, blockWidth, blockWidth, "red", id));
 });
