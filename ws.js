@@ -2,8 +2,7 @@ const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ port: 8080 });
 
-const map = require("./index.js")();
-console.log(map);
+const mainEmitter = require("./index.js");
 
 // Broadcast to all.
 wss.broadcast = function broadcast(data) {
@@ -13,6 +12,15 @@ wss.broadcast = function broadcast(data) {
     }
   });
 };
+
+let map;
+
+mainEmitter.emit("ready");
+
+mainEmitter.on("map", newMap => {
+  console.log("got map", newMap);
+  map = newMap;
+});
 
 wss.on("connection", function connection(ws) {
   const send = (...data) => {

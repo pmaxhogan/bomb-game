@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+const EventEmitter = require("events");
+
+class __MyEmitter extends EventEmitter {}
+
+const mainEmitter = new __MyEmitter();
+
 let speed = 2.5;
 
 const width = 100;
@@ -463,9 +469,16 @@ const draw = () => {
   isRunning = false;
 };
 
-module.exports = () => {
-  setInterval(draw, 1000 / 60);
-  return {
-    blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
-  };
-};
+setInterval(draw, 1000 / 60);
+
+module.exports = mainEmitter;
+
+mainEmitter.on("ready", () => {
+  console.log("ready");
+  setTimeout(() => {
+    console.log("emit");
+    mainEmitter.emit("map", {
+      blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
+    });
+  }, 1);
+});
