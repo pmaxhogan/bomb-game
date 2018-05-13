@@ -17,3 +17,16 @@ const game = (map) => {//eslint-disable-line no-unused-vars
   };
   requestAnimationFrame(draw);
 };
+
+/*const drawBullet = (ctx, x, y, radius) => {
+  ctx.fillStyle = "gray";
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2, true);
+  console.log(x, this.y);
+  ctx.fill();
+};
+
+const translateCanvas = (ctx, x, y, width, height) => {
+  ctx.translate(Math.round(-(x + (width / 2) - (ctx.canvas.offsetWidth / 2))), Math.round(-(y + (height / 2) - (ctx.canvas.offsetHeight / 2))));
+};
+*/
