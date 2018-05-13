@@ -96,17 +96,16 @@ const realCollisionBoxes = player => {
 };
 
 class Player {
-  constructor(x, y, width, height, controls, color, idx) {
+  constructor(x, y, width, height, color, id) {
     this.shotCooldown = 10;
     this.collisionBoxes = [[0, 0, width, height]];
     this.width = width;
     this.height = height;
     this.realX = x;
     this.realY = y;
-    this.controls = controls;
     this.fillColor = color;
+    this.id = id;
     this.direction = "up";
-    this.idx = idx;
   }
   draw(ctx) {
     ctx.fillStyle = this.fillColor || "black";
@@ -137,34 +136,32 @@ class Player {
       players.splice(players.indexOf(this), 1);
     }
   }
+
+  // onkeydown should be called every tick for each key that is down.
   onKeyDown(key) {
     switch (key) {
-    case this.controls.up:
+    case "up":
       this.direction = "up";
       this.y-=speed;
       break;
-    case this.controls.down:
+    case "down":
       this.direction = "down";
       this.y+=speed;
       break;
-    case this.controls.left:
+    case "left":
       this.direction = "left";
       this.x-=speed;
       break;
-    case this.controls.right:
+    case "right":
       this.direction = "right";
       this.x+=speed;
       break;
     }
   }
 
-  onKeyPress(key){
-    log(key);
-    switch(key){
-    case this.controls.shoot:
-      log("shoot");
-      bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
-    }
+  shoot(){
+    log("shoot");
+    bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
   }
 
   get x() {
@@ -435,4 +432,5 @@ mainEmitter.on("ready", () => {
 
 mainEmitter.on("newUser", id => {
   console.log("new user", id);
+  players.push(new Player());
 });
