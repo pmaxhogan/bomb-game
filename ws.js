@@ -34,6 +34,8 @@ wss.on("connection", function connection(ws) {
           switch(data.type){
           case "hello":
             send({type: "map", data: map});
+            ws.id = Symbol("WebSocket client");
+            mainEmitter.emit("newUser", ws.id);
             break;
           default:
             throw new Error("Unknown WS protocol type", data.type);

@@ -13,29 +13,11 @@ const height = 100;
 const bulletSize = 5;
 const bulletSpeed = 5;
 
-const keys = {};
 const doLog = false;
 const log = (...args) => {
-  if(doLog/* && frame % 20 === 0*/){
+  if(doLog){
     console.log(...args);// eslint-disable-line no-console
   }
-};
-
-oncontextmenu = e => {
-  e.preventDefault();
-  return false;
-};
-
-onkeydown = e => {
-  e.preventDefault();
-  keys[e.code] = true;
-  return false;
-};
-onkeyup = e => {
-  e.preventDefault();
-  players.forEach(player => player.onKeyPress(e.code));
-  delete keys[e.code];
-  return false;
 };
 
 const isCollision = (rect1, rect2) => {
@@ -362,38 +344,7 @@ map.split("\n").forEach((line, lineNumber) => {
   });
 });
 
-const players = [
-  new Player(
-    (width - 2) * blockWidth,
-    (height - 2) * blockWidth,
-    blockWidth,
-    blockWidth,
-    {
-      up: "KeyW",
-      down: "KeyS",
-      left: "KeyA",
-      right: "KeyD",
-      shoot: "KeyQ"
-    },
-    "red",
-    0
-  ),
-  new Player(
-    blockWidth,
-    blockWidth,
-    blockWidth,
-    blockWidth,
-    {
-      up: "ArrowUp",
-      down: "ArrowDown",
-      left: "ArrowLeft",
-      right: "ArrowRight",
-      shoot: "ShiftRight"
-    },
-    "blue",
-    1
-  )
-];
+const players = [];
 
 let isRunning = false;
 
@@ -464,7 +415,6 @@ const draw = () => {
   players.forEach(player => player.draw(ctx));
   blocks.forEach(block => block.draw(ctx));
   bullets.forEach(bullet => bullet.draw(ctx));
-  Object.keys(keys).forEach(key => players.forEach(player => player.onKeyDown(key)));
 
   isRunning = false;
 };
@@ -481,4 +431,8 @@ mainEmitter.on("ready", () => {
       blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
     });
   }, 1);
+});
+
+mainEmitter.on("newUser", id => {
+  console.log("new user", id);
 });
