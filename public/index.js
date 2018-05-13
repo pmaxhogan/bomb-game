@@ -6,8 +6,12 @@ socket.onopen = () => {
   console.log("[socket] connected");
   send({type: "hello", data: {}});
 };
+
+let tickCounter = 0;
+let players = [];
+
 socket.onmessage = (e) => {
-  console.log("[socket] recieved data", e.data);
+  // console.log("[socket] recieved data", e.data);
   try{
     JSON.parse(e.data).forEach(data => {
       try{
@@ -15,6 +19,16 @@ socket.onmessage = (e) => {
         case "map":
           console.log("got map", data.data);
           game(data.data);
+          break;
+        case "playerinfo":
+          console.log("info about me", data.data);
+          break;
+        case "tick":
+          players = data.data.players;
+          if(tickCounter % 10 === 0){
+            console.log("Players are", players);
+          }
+          tickCounter ++;
           break;
         default:
           throw new Error("Unknown WS protocol type", data.type);

@@ -374,6 +374,8 @@ const draw = () => {
   bullets.forEach(bullet => bullet.draw());
 
   isRunning = false;
+
+  mainEmitter.emit("tick");
 };
 
 setInterval(draw, 1000 / 60);
@@ -387,10 +389,12 @@ mainEmitter.on("ready", () => {
     mainEmitter.emit("map", {
       blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
     });
+    mainEmitter.emit("players", players);
   }, 1);
 });
 
 mainEmitter.on("newUser", id => {
   console.log("new user", id);
   players.push(new Player(blockWidth, blockWidth, blockWidth, blockWidth, "red", id));
+  console.log(players);
 });
