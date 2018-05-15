@@ -1,3 +1,5 @@
+// the most time to wait for a pong before closing the connection.
+const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
 const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ port: 8080 });
@@ -71,4 +73,34 @@ wss.on("connection", function connection(ws) {
       console.error("Unexpected error in JSON parsing", err);
     }
   });
+  ws.on("close", () => {
+    console.log("removing user", ws.id);
+    mainEmitter.emit("removeUser", ws.id);
+  });
+  ws.on("error", err => console.error("ERROR", err));
 });
+
+// detect and close broken connections.
+function noop() {}
+
+function heartbeat() {
+  this.isAlive = true;
+}
+
+wss.on("connection", function connection(ws) {
+  ws.isAlive = true;
+  ws.on("pong", heartbeat);
+});
+
+setInterval(function ping() {
+  wss.clients.forEach(function each(ws) {
+    if (ws.isAlive === false || ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED){
+      console.log("Terminating", ws.id);
+      if(ws.id) mainEmitter.emit("removeUser", ws.id);
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping(noop);
+  });
+}, MAX_CONNECTION_BROKEN_WAIT);

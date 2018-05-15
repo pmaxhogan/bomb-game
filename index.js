@@ -398,3 +398,10 @@ mainEmitter.on("newUser", id => {
   players.push(new Player(blockWidth, blockWidth, blockWidth, blockWidth, "red", id));
   console.log(players);
 });
+
+mainEmitter.on("removeUser", id => {
+  const idxArr = players.filter(player => player.id === id);
+  if(!idxArr.length) return console.error("Player", id, "not found!");
+
+  players.splice(idxArr[0], 1);
+});
