@@ -65,7 +65,7 @@ const playerCollisionCheck = (playerCollisionBoxes, objsToTest = blocks) => {
           height: blockBox[3]
         })){
           objCollidedWith = block;
-          log("COLLISION");
+          log("COLLISION", block);
           return true;
         }
       });
@@ -199,9 +199,9 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
   const collision = playerCollisionCheck(mapped, joined);
 
   if(collision){
-    if(typeof collision.idx === "number"){
+    if(collision instanceof Player){
       // console.warn(players.indexOf(bullet.player), collision.idx);
-      if(players.indexOf(bullet.player) !== collision.idx){
+      if(bullet.player !== collision){
         players[collision.idx].kill();
         bullet.remove();
         return newVal;
@@ -228,6 +228,7 @@ class Bullet {
     this.size = bulletSize;
     this.direction = direction;
     this.speed = bulletSpeed;
+    this.fillColor = player.fillColor;
     this.collisionBoxes = [[-this.size / 2, -this.size / 2, this.size / 2, this.size / 2]];
     this.player = player;
   }
@@ -328,7 +329,12 @@ const drawNoise = (x, y, w, h, density) => {
   for(let i = 0; i < w; i++){
     for(let i2 = 0; i2 < h; i2++){
       if(Math.random() < density){
-        blocks.push(new Block(i * blockWidth + (x * blockWidth), i2 * blockWidth + (y * blockWidth), blockWidth, blockWidth));
+        blocks.push(new Block(
+          i * blockWidth + (x * blockWidth),
+          i2 * blockWidth + (y * blockWidth),
+          blockWidth,
+          blockWidth
+        ));
         players.forEach(player => {
           if(playerCollisionCheck(realCollisionBoxes(player))){
             blocks.pop();
@@ -338,16 +344,6 @@ const drawNoise = (x, y, w, h, density) => {
     }
   }
 };
-
-// for(var x = 0; x < width; x ++){
-//   for(var y = 0; y < height; y ++){
-//     if(playerCollisionCheck({
-//       collisionBoxes: [[x * blockWidth, y * blockWidth, (x + 1) * blockWidth, (y + 1) * blockWidth]]
-//     }, blocks)){
-//
-//     }
-// }
-// }
 
 drawBorder(0, 0, width, height);
 drawNoise(1, 1, width - 2, height - 2, 0.2);
@@ -393,6 +389,7 @@ mainEmitter.on("ready", () => {
       blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
     });
     mainEmitter.emit("players", players);
+    mainEmitter.emit("bullets", bullets);
   }, 1);
 });
 
@@ -458,5 +455,16 @@ mainEmitter.on("keyUp", data => {
     keys[data.id][key] = false;
   } catch (e) {
     console.error("could not get player.", e.message);
+  }
+});
+
+mainEmitter.on("keyPress", data => {
+  if(data.key === "q"){
+    players.some((player) => {
+      if(player.id === data.id){
+        player.shoot();
+        return true;
+      }
+    });
   }
 });

@@ -17,6 +17,7 @@ wss.broadcast = function broadcast(...data) {
 
 let map;
 let players;
+let bullets;
 
 mainEmitter.emit("ready");
 
@@ -25,6 +26,7 @@ mainEmitter.on("map", newMap => {
 });
 
 mainEmitter.on("players", newPlayers => players = newPlayers);
+mainEmitter.on("bullets", newBullets => bullets = newBullets);
 
 mainEmitter.on("tick", () => {
   if(!players) return;
@@ -39,6 +41,14 @@ mainEmitter.on("tick", () => {
         direction: player.direction,
         fillColor: player.fillColor,
         id: player.id
+      })),
+      bullets: bullets.map(bullet => ({
+        x: bullet.x,
+        y: bullet.y,
+        width: bullet.width,
+        height: bullet.height,
+        direction: bullet.direction,
+        fillColor: bullet.fillColor
       }))
     }
   });
