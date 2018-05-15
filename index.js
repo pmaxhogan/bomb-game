@@ -105,9 +105,10 @@ class Player {
     this.fillColor = color;
     this.id = id;
     this.direction = "up";
+    this.shotCooldown = 0;
   }
   draw() {
-    // TODO: add code?
+    this.shotCooldown --;
   }
   kill(){
     // alert("RIP " + this.fillColor);
@@ -141,8 +142,10 @@ class Player {
   }
 
   shoot(){
+    if(this.shotCooldown > 0) return;
     log("shoot");
     bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
+    this.shotCooldown = 20;
   }
 
   get x() {
