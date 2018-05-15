@@ -27,6 +27,7 @@ mainEmitter.on("map", newMap => {
 mainEmitter.on("players", newPlayers => players = newPlayers);
 
 mainEmitter.on("tick", () => {
+  if(!players) return;
   wss.broadcast({
     type: "tick",
     data: {
