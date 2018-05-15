@@ -28,7 +28,7 @@ socket.onmessage = (e) => {
           break;
         case "tick":
           players = data.data.players;
-          if(tickCounter % 60 === 0){
+          if(tickCounter % 120 === 0){
             console.log("Players are", players);
           }
           tickCounter ++;

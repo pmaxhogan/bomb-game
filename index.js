@@ -406,10 +406,12 @@ mainEmitter.on("newUser", id => {
 });
 
 mainEmitter.on("removeUser", id => {
-  const idxArr = players.filter(player => player.id === id);
-  if(!idxArr.length) return console.error("Player", id, "not found!");
-
-  players.splice(idxArr[0], 1);
+  console.log(players, id);
+  players.forEach((player, idx) => {
+    if(player.id === id){
+      players.splice(idx, 1);
+    }
+  });
 });
 
 const keys = {};
