@@ -1,5 +1,17 @@
 /* global players: false, myId: false, bullets: false */
 
+const isCollision = (rect1, rect2) => {
+  if (
+    rect1.x < rect2.x + rect2.width &&
+      rect1.x + rect1.width > rect2.x &&
+      rect1.y < rect2.y + rect2.height &&
+      rect1.height + rect1.y > rect2.y
+  ) {
+    return true;
+  }
+  return false;
+};
+
 const translateCanvas = (x, y, width, height, canvasWidth, canvasHeight, ctx) => {
   const xToTranslate = Math.round(-(x + (width / 2) - (canvasWidth / 2)));
   const yToTranslate = Math.round(-(y + (height / 2) - (canvasHeight / 2)));
