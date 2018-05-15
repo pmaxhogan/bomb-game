@@ -393,7 +393,6 @@ module.exports = mainEmitter;
 mainEmitter.on("ready", () => {
   console.log("ready");
   setTimeout(() => {
-    console.log("emit");
     mainEmitter.emit("map", {
       blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
     });
@@ -404,7 +403,6 @@ mainEmitter.on("ready", () => {
 mainEmitter.on("newUser", id => {
   console.log("new user", id);
   players.push(new Player(blockWidth, blockWidth, blockWidth, blockWidth, "red", id));
-  console.log(players);
 });
 
 mainEmitter.on("removeUser", id => {
@@ -425,9 +423,7 @@ mainEmitter.on("keyDown", data => {
   };
 
   const key = map[data.key];
-  console.log(key);
   try {
-    console.log(keys);
     if(!keys[data.id]){
       keys[data.id] = {};
     }
@@ -445,7 +441,6 @@ mainEmitter.on("keyUp", data => {
   };
 
   const key = map[data.key];
-  console.log(key);
   try {
     if(!keys[data.id]){
       keys[data.id] = {};
