@@ -1,3 +1,12 @@
+/* global players: false, myId: false */
+
+const translateCanvas = (x, y, width, height, canvasWidth, canvasHeight, ctx) => {
+  const xToTranslate = Math.round(-(x + (width / 2) - (canvasWidth / 2)));
+  const yToTranslate = Math.round(-(y + (height / 2) - (canvasHeight / 2)));
+  console.log(xToTranslate, yToTranslate);
+  ctx.translate(xToTranslate, yToTranslate);
+};
+
 const game = (map) => {//eslint-disable-line no-unused-vars
   const canvas = document.querySelector("canvas");
   const ctx = canvas.getContext("2d");
@@ -9,10 +18,27 @@ const game = (map) => {//eslint-disable-line no-unused-vars
   onresize = setSize;
   setSize();
 
+  let player = players.filter(player => player.id === myId)[0];
+
   const draw = function(){
-    map.blocks.forEach(block => {
-      ctx.fillRect(block[0], block[1], block[2], block[3]);
-    });
+    if(!player){
+      console.log("none");
+      player = players.filter(player => player.id === myId)[0];
+    }else{
+      ctx.save();
+      translateCanvas(player.x, player.y, player.width, player.width, innerWidth, innerHeight, ctx);
+      map.blocks.forEach(block => {
+        ctx.fillStyle = "black";
+        ctx.fillRect(block[0], block[1], block[2], block[3]);
+      });
+      players.forEach(player => {
+        ctx.fillStyle = player.fillColor;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+      });
+
+      ctx.restore();
+    }
+
     requestAnimationFrame(draw);
   };
   requestAnimationFrame(draw);

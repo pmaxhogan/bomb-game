@@ -10,6 +10,8 @@ socket.onopen = () => {
 let tickCounter = 0;
 let players = [];
 
+let myId = null;//eslint-disable-line no-unused-vars
+
 socket.onmessage = (e) => {
   // console.log("[socket] recieved data", e.data);
   try{
@@ -22,6 +24,7 @@ socket.onmessage = (e) => {
           break;
         case "playerinfo":
           console.log("info about me", data.data);
+          myId = data.data.id;
           break;
         case "tick":
           players = data.data.players;
