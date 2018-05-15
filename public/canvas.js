@@ -3,7 +3,6 @@
 const translateCanvas = (x, y, width, height, canvasWidth, canvasHeight, ctx) => {
   const xToTranslate = Math.round(-(x + (width / 2) - (canvasWidth / 2)));
   const yToTranslate = Math.round(-(y + (height / 2) - (canvasHeight / 2)));
-  console.log(xToTranslate, yToTranslate);
   ctx.translate(xToTranslate, yToTranslate);
 };
 
@@ -25,6 +24,7 @@ const game = (map) => {//eslint-disable-line no-unused-vars
       console.log("none");
       player = players.filter(player => player.id === myId)[0];
     }else{
+      ctx.clearRect(0, 0, 3000, 5000);
       ctx.save();
       translateCanvas(player.x, player.y, player.width, player.width, innerWidth, innerHeight, ctx);
       map.blocks.forEach(block => {

@@ -369,7 +369,15 @@ const draw = () => {
   }
   isRunning = true;
 
-  players.forEach(player => player.draw());
+
+  players.forEach(player => {
+    if(keys[player.id]){
+      Object.keys(keys[player.id]).forEach(key => {
+        if(key && keys[player.id][key]) player.onKeyDown(key);
+      });
+    }
+    player.draw();
+  });
   blocks.forEach(block => block.draw());
   bullets.forEach(bullet => bullet.draw());
 
@@ -404,4 +412,46 @@ mainEmitter.on("removeUser", id => {
   if(!idxArr.length) return console.error("Player", id, "not found!");
 
   players.splice(idxArr[0], 1);
+});
+
+const keys = {};
+
+mainEmitter.on("keyDown", data => {
+  const map = {
+    w: "up",
+    s: "down",
+    a: "left",
+    d: "right"
+  };
+
+  const key = map[data.key];
+  console.log(key);
+  try {
+    console.log(keys);
+    if(!keys[data.id]){
+      keys[data.id] = {};
+    }
+    keys[data.id][key] = true;
+  } catch (e) {
+    console.error("could not get player.", e.message);
+  }
+});
+mainEmitter.on("keyUp", data => {
+  const map = {
+    w: "up",
+    s: "down",
+    a: "left",
+    d: "right"
+  };
+
+  const key = map[data.key];
+  console.log(key);
+  try {
+    if(!keys[data.id]){
+      keys[data.id] = {};
+    }
+    keys[data.id][key] = false;
+  } catch (e) {
+    console.error("could not get player.", e.message);
+  }
 });

@@ -21,7 +21,6 @@ let players;
 mainEmitter.emit("ready");
 
 mainEmitter.on("map", newMap => {
-  console.log("got map", newMap);
   map = newMap;
 });
 
@@ -50,7 +49,6 @@ wss.on("connection", function connection(ws) {
     ws.send(JSON.stringify(data));
   };
   ws.on("message", function incoming(data) {
-    console.log("[socket] recieved", data);
     try{
       JSON.parse(data).forEach(data => {
         try{
@@ -61,6 +59,22 @@ wss.on("connection", function connection(ws) {
               id: ws.id
             }});
             mainEmitter.emit("newUser", ws.id);
+            break;
+          case "keyDown":
+            if(["w", "a", "s", "d"].includes(data.data)){
+              mainEmitter.emit("keyDown", {
+                key: data.data,
+                id: ws.id
+              });
+            }
+            break;
+          case "keyUp":
+            if(["w", "a", "s", "d"].includes(data.data)){
+              mainEmitter.emit("keyUp", {
+                key: data.data,
+                id: ws.id
+              });
+            }
             break;
           default:
             throw new Error("Unknown WS protocol type", data.type);

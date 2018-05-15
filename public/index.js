@@ -12,8 +12,8 @@ let players = [];
 
 let myId = null;//eslint-disable-line no-unused-vars
 
+
 socket.onmessage = (e) => {
-  // console.log("[socket] recieved data", e.data);
   try{
     JSON.parse(e.data).forEach(data => {
       try{
@@ -28,7 +28,7 @@ socket.onmessage = (e) => {
           break;
         case "tick":
           players = data.data.players;
-          if(tickCounter % 10 === 0){
+          if(tickCounter % 60 === 0){
             console.log("Players are", players);
           }
           tickCounter ++;
@@ -47,4 +47,15 @@ socket.onmessage = (e) => {
 
 const send = (...data) => {
   socket.send(JSON.stringify(data));
+};
+
+onkeydown = e => {
+  if(["w", "a", "s", "d"].includes(e.key)){
+    send({type: "keyDown", data: e.key});
+  }
+};
+onkeyup = e => {
+  if(["w", "a", "s", "d"].includes(e.key)){
+    send({type: "keyUp", data: e.key});
+  }
 };
