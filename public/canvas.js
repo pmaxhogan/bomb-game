@@ -17,16 +17,16 @@ const game = (map) => {//eslint-disable-line no-unused-vars
   onresize = setSize;
   setSize();
 
-  let player = players.filter(player => player.id === myId)[0];
 
   const draw = function(){
+    let player = players.filter(player => player.id === myId)[0];
     if(!player){
       console.log("none");
-      player = players.filter(player => player.id === myId)[0];
     }else{
       ctx.clearRect(0, 0, 3000, 5000);
       ctx.save();
-      translateCanvas(player.x, player.y, player.width, player.width, innerWidth, innerHeight, ctx);
+      console.log(player.x, player.y);
+      translateCanvas(player.x, player.y, player.width, player.height, innerWidth, innerHeight, ctx);
       map.blocks.forEach(block => {
         ctx.fillStyle = "black";
         ctx.fillRect(block[0], block[1], block[2], block[3]);
