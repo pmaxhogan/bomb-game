@@ -194,11 +194,7 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
     });
   }
 
-  let joined = [].concat(players/*.map((player, idx) => ({
-    collisionBoxes: realCollisionBoxes(player),
-    idx
-  }))*/);
-  joined = joined.concat(blocks);
+  let joined = players.concat(blocks);
 
   const collision = playerCollisionCheck(mapped, joined);
 
@@ -402,7 +398,18 @@ mainEmitter.on("ready", () => {
 
 mainEmitter.on("newUser", id => {
   console.log("new user", id);
-  players.push(new Player(blockWidth, blockWidth, blockWidth, blockWidth, "red", id));
+  let validLocation = false;
+  while(!validLocation){
+    const x = Math.round((Math.random() * (width - 2) + 1)) * blockWidth;
+    const y = Math.round((Math.random() * (height - 1) + 1)) * blockWidth;
+    const player = new Player(x, y, blockWidth, blockWidth, "red", id);
+    if(playerCollisionCheck(realCollisionBoxes(player))){
+      validLocation = false;
+    }else{
+      validLocation = true;
+      players.push(player);
+    }
+  }
 });
 
 mainEmitter.on("removeUser", id => {
