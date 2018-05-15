@@ -77,6 +77,14 @@ wss.on("connection", function connection(ws) {
               });
             }
             break;
+          case "keyPress":
+            if(data.data === "q"){
+              mainEmitter.emit("keyPress", {
+                key: data.data,
+                id: ws.id
+              });
+            }
+            break;
           default:
             throw new Error("Unknown WS protocol type", data.type);
           }

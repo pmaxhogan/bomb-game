@@ -59,3 +59,8 @@ onkeyup = e => {
     send({type: "keyUp", data: e.key});
   }
 };
+onkeypress = e => {
+  if(e.key === "q"){
+    send({type: "keyPress", data: e.key});
+  }
+};

@@ -432,6 +432,7 @@ mainEmitter.on("keyDown", data => {
     console.error("could not get player.", e.message);
   }
 });
+
 mainEmitter.on("keyUp", data => {
   const map = {
     w: "up",
