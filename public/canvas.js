@@ -25,7 +25,6 @@ const game = (map) => {//eslint-disable-line no-unused-vars
     }else{
       ctx.clearRect(0, 0, 3000, 5000);
       ctx.save();
-      console.log(player.x, player.y);
       translateCanvas(player.x, player.y, player.width, player.height, innerWidth, innerHeight, ctx);
       map.blocks.forEach(block => {
         ctx.fillStyle = "black";
