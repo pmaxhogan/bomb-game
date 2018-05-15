@@ -8,7 +8,8 @@ socket.onopen = () => {
 };
 
 let tickCounter = 0;
-let players = [];
+let players = [];//eslint-disable-line no-unused-vars
+let bullets = [];//eslint-disable-line no-unused-vars
 
 let myId = null;//eslint-disable-line no-unused-vars
 
@@ -28,6 +29,7 @@ socket.onmessage = (e) => {
           break;
         case "tick":
           players = data.data.players;
+          bullets = data.data.bullets;
           if(tickCounter % 120 === 0){
             console.log("Players are", players);
           }

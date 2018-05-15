@@ -47,6 +47,7 @@ mainEmitter.on("tick", () => {
         y: bullet.y,
         width: bullet.width,
         height: bullet.height,
+        size: bullet.size,
         direction: bullet.direction,
         fillColor: bullet.fillColor
       }))

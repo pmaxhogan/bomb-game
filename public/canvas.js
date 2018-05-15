@@ -1,4 +1,4 @@
-/* global players: false, myId: false */
+/* global players: false, myId: false, bullets: false */
 
 const translateCanvas = (x, y, width, height, canvasWidth, canvasHeight, ctx) => {
   const xToTranslate = Math.round(-(x + (width / 2) - (canvasWidth / 2)));
@@ -29,6 +29,12 @@ const game = (map) => {//eslint-disable-line no-unused-vars
       map.blocks.forEach(block => {
         ctx.fillStyle = "black";
         ctx.fillRect(block[0], block[1], block[2], block[3]);
+      });
+      bullets.forEach(bullet => {
+        ctx.fillStyle = bullet.fillStyle;
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2, true);
+        ctx.fill();
       });
       players.forEach(player => {
         ctx.fillStyle = player.fillColor;
