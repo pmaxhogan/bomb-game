@@ -203,7 +203,6 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
 
   if(collision){
     if(collision instanceof Player){
-      // console.warn(players.indexOf(bullet.player), collision.idx);
       if(bullet.player !== collision){
         players.splice(players.indexOf(collision), 1);
         bullet.remove();

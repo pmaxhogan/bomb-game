@@ -17,12 +17,21 @@ const game = (map) => {//eslint-disable-line no-unused-vars
   onresize = setSize;
   setSize();
 
+  let hasLived = false;
+
 
   const draw = function(){
     let player = players.filter(player => player.id === myId)[0];
     if(!player){
-      console.log("none");
+      if(hasLived){
+        ctx.clearRect(0, 0, 3000, 5000);
+        alert("YOU ARE DEAD");
+        return;
+      }else{
+        console.log("none", players);
+      }
     }else{
+      hasLived = true;
       ctx.clearRect(0, 0, 3000, 5000);
       ctx.save();
       translateCanvas(player.x, player.y, player.width, player.height, innerWidth, innerHeight, ctx);
