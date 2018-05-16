@@ -352,11 +352,6 @@ drawNoise(1, 1, width - 2, height - 2, 0.2);
 
 const bullets = [];
 
-onkeypress = e => {
-  e.preventDefault();
-  return false;
-};
-
 const draw = () => {
   if(isRunning){
     throw new Error("OOF");
