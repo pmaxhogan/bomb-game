@@ -1,5 +1,7 @@
 /* global players: false, myId: false, bullets: false */
 
+let kill = false;
+
 const isCollision = (rect1, rect2) => {
   if (
     rect1.x < rect2.x + rect2.width &&
@@ -31,7 +33,6 @@ const game = (map) => {//eslint-disable-line no-unused-vars
 
   let hasLived = false;
 
-
   const draw = function(){
     let player = players.filter(player => player.id === myId)[0];
     if(!player){
@@ -44,10 +45,24 @@ const game = (map) => {//eslint-disable-line no-unused-vars
       }
     }else{
       hasLived = true;
+
       ctx.clearRect(0, 0, 3000, 5000);
       ctx.save();
       translateCanvas(player.x, player.y, player.width, player.height, innerWidth, innerHeight, ctx);
       map.blocks.forEach(block => {
+        if(!isCollision({
+          x: block[0],
+          y: block[1],
+          width: block[2],
+          height: block[3]
+        }, {
+          x: Math.round(player.x + (player.width / 2) - (innerWidth / 2)),
+          y:  Math.round(player.y + (player.height / 2) - (innerHeight / 2)),
+          width: innerWidth,
+          height: innerHeight
+        })){
+          return;
+        }
         ctx.fillStyle = "black";
         ctx.fillRect(block[0], block[1], block[2], block[3]);
       });
@@ -65,7 +80,7 @@ const game = (map) => {//eslint-disable-line no-unused-vars
       ctx.restore();
     }
 
-    requestAnimationFrame(draw);
+    if(!kill) requestAnimationFrame(draw);
   };
   requestAnimationFrame(draw);
 };
