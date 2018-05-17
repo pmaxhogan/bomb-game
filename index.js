@@ -348,7 +348,7 @@ const drawNoise = (x, y, w, h, density) => {
 };
 
 drawBorder(0, 0, width, height);
-drawNoise(1, 1, width - 2, height - 2, 0.2);
+drawNoise(1, 1, width - 2, height - 2, 0.1);
 
 const bullets = [];
 
