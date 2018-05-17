@@ -1,5 +1,8 @@
 // the most time to wait for a pong before closing the connection.
 const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
+
+// 1 out of every n ticks is sent to the client.
+const tickSkip = 1;
 const WebSocket = require("ws");
 
 const wss = new WebSocket.Server({ port: process.env.PORT || 5000, host: process.env.HOST || "127.0.0.1" });
@@ -28,31 +31,38 @@ mainEmitter.on("map", newMap => {
 mainEmitter.on("players", newPlayers => players = newPlayers);
 mainEmitter.on("bullets", newBullets => bullets = newBullets);
 
+let tickCounter = 0;
+
 mainEmitter.on("tick", () => {
   if(!players) return;
-  wss.broadcast({
-    type: "tick",
-    data: {
-      players: players.map(player => ({
-        x: player.x,
-        y: player.y,
-        width: player.width,
-        height: player.height,
-        direction: player.direction,
-        fillColor: player.fillColor,
-        id: player.id
-      })),
-      bullets: bullets.map(bullet => ({
-        x: bullet.x,
-        y: bullet.y,
-        width: bullet.width,
-        height: bullet.height,
-        size: bullet.size,
-        direction: bullet.direction,
-        fillColor: bullet.fillColor
-      }))
-    }
-  });
+
+  if(tickCounter % tickSkip === 0){
+    wss.broadcast({
+      type: "tick",
+      data: {
+        players: players.map(player => ({
+          x: player.x,
+          y: player.y,
+          width: player.width,
+          height: player.height,
+          direction: player.direction,
+          fillColor: player.fillColor,
+          id: player.id
+        })),
+        bullets: bullets.map(bullet => ({
+          x: bullet.x,
+          y: bullet.y,
+          width: bullet.width,
+          height: bullet.height,
+          size: bullet.size,
+          direction: bullet.direction,
+          fillColor: bullet.fillColor
+        }))
+      }
+    });
+  }
+
+  tickCounter ++;
 });
 
 wss.on("connection", function connection(ws) {
