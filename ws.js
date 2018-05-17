@@ -2,7 +2,7 @@
 const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
 const WebSocket = require("ws");
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: process.env.PORT || 5000 });
 
 const mainEmitter = require("./index.js");
 
