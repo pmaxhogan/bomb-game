@@ -2,7 +2,7 @@
   "name": "pixel-shooter",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "ws.js",
   "dependencies": {
     "uws": "^10.148.0"
   },

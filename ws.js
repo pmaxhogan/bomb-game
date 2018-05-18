@@ -7,7 +7,7 @@ const WebSocket = require("uws");
 
 const wss = new WebSocket.Server({ port: process.env.PORT || 5000, host: process.env.HOST || "127.0.0.1" });
 
-const mainEmitter = require("./index.js");
+const mainEmitter = require("./game.js");
 
 const convertBase = (value, from_base, to_base) => {
   value = value.toString();
