@@ -3,7 +3,7 @@ const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
 
 // 1 out of every n ticks is sent to the client.
 const tickSkip = 1;
-const WebSocket = require("ws");
+const WebSocket = require("uws");
 
 const wss = new WebSocket.Server({ port: process.env.PORT || 5000, host: process.env.HOST || "127.0.0.1" });
 
