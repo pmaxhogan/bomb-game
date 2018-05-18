@@ -16,7 +16,10 @@ const convertBase = (value, from_base, to_base) => {
   var to_range = range.slice(0, to_base);
 
   var dec_value = value.split("").reverse().reduce(function (carry, digit, index) {
-    if (from_range.indexOf(digit) === -1) throw new Error("Invalid digit `"+digit+"` for base "+from_base+".");
+    if (from_range.indexOf(digit) === -1){
+      console.trace();
+      throw new Error("Invalid digit `"+digit+"` for base "+from_base+".");
+    }
     return carry += from_range.indexOf(digit) * (Math.pow(from_base, index));
   }, 0);
 
@@ -79,6 +82,28 @@ mainEmitter.on("players", newPlayers => players = newPlayers);
 mainEmitter.on("bullets", newBullets => bullets = newBullets);
 
 let tickCounter = 0;
+
+mainEmitter.prependListener("removeUser", id => {
+  wss.broadcast({
+    type: "removePlayer",
+    data: id
+  });
+});
+
+mainEmitter.on("newUser", () => {
+  let newUser = players[players.length - 1];
+  wss.broadcast({
+    type: "newUser",
+    data: {
+      x: newUser.x,
+      y: newUser.y,
+      width: newUser.width,
+      height: newUser.height,
+      color: newUser.color,
+      id: newUser.id
+    }
+  });
+});
 
 mainEmitter.on("tick", () => {
   if(!players) return;
@@ -172,6 +197,7 @@ wss.on("connection", function connection(ws) {
     }
   });
   ws.on("close", () => {
+    console.trace();
     console.log("removing user", ws.id);
     mainEmitter.emit("removeUser", ws.id);
   });

@@ -6,6 +6,8 @@ class __MyEmitter extends EventEmitter {}
 
 const mainEmitter = new __MyEmitter();
 
+// const colors = ["red", "orange", "#f7ec4f", "green", "blue", "black", "purple"];
+
 let speed = 2.5;
 
 const width = 100;
@@ -95,14 +97,14 @@ const realCollisionBoxes = player => {
 };
 
 class Player {
-  constructor(x, y, width, height, color, id) {
+  constructor(x, y, width, height, id) {
     this.shotCooldown = 10;
     this.collisionBoxes = [[0, 0, width, height]];
     this.width = width;
     this.height = height;
     this.realX = x;
     this.realY = y;
-    this.fillColor = color;
+    this.fillColor = "hsl(" + Math.floor(Math.random() * 255) + ", 100%, 50%)";
     this.id = id;
     this.direction = "up";
     this.shotCooldown = 0;
@@ -396,7 +398,7 @@ mainEmitter.on("newUser", id => {
   while(!validLocation){
     const x = Math.round((Math.random() * (width - 2) + 1)) * blockWidth;
     const y = Math.round((Math.random() * (height - 1) + 1)) * blockWidth;
-    const player = new Player(x, y, blockWidth, blockWidth, "red", id);
+    const player = new Player(x, y, blockWidth, blockWidth, id);
     if(playerCollisionCheck(realCollisionBoxes(player))){
       validLocation = false;
     }else{
@@ -407,7 +409,6 @@ mainEmitter.on("newUser", id => {
 });
 
 mainEmitter.on("removeUser", id => {
-  console.log(players, id);
   players.forEach((player, idx) => {
     if(player.id === id){
       players.splice(idx, 1);
