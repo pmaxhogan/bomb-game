@@ -9,10 +9,57 @@ const wss = new WebSocket.Server({ port: process.env.PORT || 5000, host: process
 
 const mainEmitter = require("./index.js");
 
+const convertBase = (value, from_base, to_base) => {
+  value = value.toString();
+  var range = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/".split("");
+  var from_range = range.slice(0, from_base);
+  var to_range = range.slice(0, to_base);
+
+  var dec_value = value.split("").reverse().reduce(function (carry, digit, index) {
+    if (from_range.indexOf(digit) === -1) throw new Error("Invalid digit `"+digit+"` for base "+from_base+".");
+    return carry += from_range.indexOf(digit) * (Math.pow(from_base, index));
+  }, 0);
+
+  var new_value = "";
+  while (dec_value > 0) {
+    new_value = to_range[dec_value % to_base] + new_value;
+    dec_value = (dec_value - (dec_value % to_base)) / to_base;
+  }
+  return new_value || "0";
+};
+
+const stringifyResponse = (players, bullets) => {
+  let str = "";
+
+  str += players.reduce((str, player) => {
+    str += "!";
+    str += convertBase(Math.floor(player.x), 10, 64) + "=";
+    str += convertBase(Math.floor(player.y), 10, 64) + "=";
+    str += convertBase(Math.floor(player.id), 10, 64) + "=";
+    str += ({
+      "up": "u",
+      "down": "d",
+      "left": "l",
+      "right": "r"
+    })[player.direction];
+    return str;
+  }, "");
+
+  str += bullets.reduce((str, bullet) => {
+    str += "?";
+    str += convertBase(Math.floor(bullet.x), 10, 64) + "=";
+    str += convertBase(Math.floor(bullet.y), 10, 64);
+    return str;
+  }, "");
+
+  return str;
+};
+
 // Broadcast to all.
 wss.broadcast = function broadcast(...data) {
   wss.clients.forEach(function each(client) {
     if (client.readyState === WebSocket.OPEN) {
+      if(!JSON.stringify(data).trim()) throw data;
       client.send(JSON.stringify(data));
     }
   });
@@ -37,6 +84,12 @@ mainEmitter.on("tick", () => {
   if(!players) return;
 
   if(tickCounter % tickSkip === 0){
+    wss.clients.forEach(function each(client) {
+      if (client.readyState === WebSocket.OPEN) {
+        if(!JSON.stringify(stringifyResponse(players, bullets)).trim()) throw stringifyResponse(players, bullets);
+        client.send(stringifyResponse(players, bullets));
+      }
+    });
     wss.broadcast({
       type: "tick",
       data: {
@@ -68,6 +121,7 @@ mainEmitter.on("tick", () => {
 wss.on("connection", function connection(ws) {
   const send = (...data) => {
     if(ws.readyState !== WebSocket.OPEN) return;
+    if(!JSON.stringify(data).trim()) throw data;
     ws.send(JSON.stringify(data));
   };
   ws.on("message", function incoming(data) {
@@ -76,7 +130,7 @@ wss.on("connection", function connection(ws) {
         try{
           switch(data.type){
           case "hello":
-            ws.id = Math.random();
+            ws.id = Math.floor(Math.random() * 32768);
             send({type: "map", data: map}, {type: "playerinfo", data: {
               id: ws.id
             }});
