@@ -282,29 +282,14 @@ class Bullet {
 }
 
 const blocks = [];
-const map = `
-   #           ##
-    #          #         #
-    #          #         #
-     #         #  #####  #
-#              #      #  #
-#              #      #  #
-#              #####  #  #
-#
-
-   #####
-   #####
-   #####
-   #####
-   #####
-`.slice(1, -1);
 
 const blockWidth = 20;
 
+const map = require("fs").readFileSync(__dirname + "/maps/map1.txt").toString();
+
 map.split("\n").forEach((line, lineNumber) => {
   line.split("").forEach((char, idx) => {
-    log(char);
-    if(char === "##"){
+    if(char === "#"){
       log(idx, lineNumber);
       blocks.push(new Block(idx * blockWidth, lineNumber * blockWidth, blockWidth, blockWidth));
     }
@@ -315,6 +300,7 @@ const players = [];
 
 let isRunning = false;
 
+/*
 const drawBorder = (x, y, w, h) => {
   for(let i = 0; i < w; i++){
     blocks.push(new Block(x + i * blockWidth, y, blockWidth, blockWidth));
@@ -344,9 +330,10 @@ const drawNoise = (x, y, w, h, density) => {
     }
   }
 };
+*/
 
-drawBorder(0, 0, width, height);
-drawNoise(1, 1, width - 2, height - 2, 0.1);
+// drawBorder(0, 0, width, height);
+// drawNoise(1, 1, width - 2, height - 2, 0.1);
 
 const bullets = [];
 
