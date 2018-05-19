@@ -198,7 +198,6 @@ wss.on("connection", function connection(ws) {
     }
   });
   ws.on("close", () => {
-    console.trace();
     console.log("removing user", ws.id);
     mainEmitter.emit("removeUser", ws.id);
   });
