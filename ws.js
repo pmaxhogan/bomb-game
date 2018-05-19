@@ -151,6 +151,7 @@ wss.on("connection", function connection(ws) {
   };
   ws.on("message", function incoming(data) {
     try{
+      const validKeys = ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"];
       JSON.parse(data).forEach(data => {
         try{
           switch(data.type){
@@ -162,7 +163,7 @@ wss.on("connection", function connection(ws) {
             mainEmitter.emit("newUser", ws.id);
             break;
           case "keyDown":
-            if(["w", "a", "s", "d"].includes(data.data)){
+            if(validKeys.includes(data.data)){
               mainEmitter.emit("keyDown", {
                 key: data.data,
                 id: ws.id
@@ -170,7 +171,7 @@ wss.on("connection", function connection(ws) {
             }
             break;
           case "keyUp":
-            if(["w", "a", "s", "d"].includes(data.data)){
+            if(validKeys.includes(data.data)){
               mainEmitter.emit("keyUp", {
                 key: data.data,
                 id: ws.id

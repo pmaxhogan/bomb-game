@@ -125,19 +125,15 @@ class Player {
   onKeyDown(key) {
     switch (key) {
     case "up":
-      this.direction = "up";
       this.y-=speed;
       break;
     case "down":
-      this.direction = "down";
       this.y+=speed;
       break;
     case "left":
-      this.direction = "left";
       this.x-=speed;
       break;
     case "right":
-      this.direction = "right";
       this.x+=speed;
       break;
     }
@@ -418,45 +414,42 @@ mainEmitter.on("removeUser", id => {
 
 const keys = {};
 
-mainEmitter.on("keyDown", data => {
-  const map = {
-    w: "up",
-    s: "down",
-    a: "left",
-    d: "right"
-  };
-
-  const key = map[data.key];
-  try {
-    if(!keys[data.id]){
-      keys[data.id] = {};
+const getEmitterFunc = (isKeyDown) => {
+  return data => {
+    if(data.key.slice(0, 5) === "arrow"){
+      players.forEach((player) => {
+        if(player.id === data.id){
+          player.direction = data.key.slice(5);
+        }
+      });
+      return;
     }
-    keys[data.id][key] = true;
-  } catch (e) {
-    console.error("could not get player.", e.message);
-  }
-});
 
-mainEmitter.on("keyUp", data => {
-  const map = {
-    w: "up",
-    s: "down",
-    a: "left",
-    d: "right"
-  };
+    const map = {
+      w: "up",
+      s: "down",
+      a: "left",
+      d: "right"
+    };
 
-  const key = map[data.key];
-  try {
-    if(!keys[data.id]){
-      keys[data.id] = {};
+    const key = map[data.key];
+    try {
+      if(!keys[data.id]){
+        keys[data.id] = {};
+      }
+      keys[data.id][key] = isKeyDown;
+    } catch (e) {
+      console.error("could not get player.", e.message);
     }
-    keys[data.id][key] = false;
-  } catch (e) {
-    console.error("could not get player.", e.message);
-  }
-});
+  };
+};
+
+mainEmitter.on("keyDown", getEmitterFunc(true));
+
+mainEmitter.on("keyUp", getEmitterFunc(false));
 
 mainEmitter.on("keyPress", data => {
+  console.log(data);
   if(data.key === "q"){
     players.some((player) => {
       if(player.id === data.id){
