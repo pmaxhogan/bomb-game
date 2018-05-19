@@ -13,7 +13,7 @@ let speed = 2.5;
 const width = 100;
 const height = 100;
 const bulletSize = 5;
-const bulletSpeed = 5;
+const bulletSpeed = 10;
 
 const doLog = false;
 const log = (...args) => {
