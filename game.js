@@ -233,7 +233,7 @@ class Bullet {
     this.player = player;
   }
   draw(){
-    if(this.x < -100 || this.y < -100 || this.x > (width * blockWidth) + 100  || this.y > (height * blockWidth) + 100){
+    if(this.x <= 0 || this.y <= 0 || this.x > (width * blockWidth) + 100  || this.y > (height * blockWidth) + 100){
       return this.remove();
     }
 
