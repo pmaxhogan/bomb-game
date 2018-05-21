@@ -289,7 +289,7 @@ const map = require("fs").readFileSync(__dirname + "/maps/map1.txt").toString();
 
 map.split("\n").forEach((line, lineNumber) => {
   line.split("").forEach((char, idx) => {
-    if(char === "##"){
+    if(char === "#"){
       log(idx, lineNumber);
       blocks.push(new Block(idx * blockWidth, lineNumber * blockWidth, blockWidth, blockWidth));
     }
