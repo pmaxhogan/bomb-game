@@ -49,6 +49,7 @@ const stringifyResponse = (players, bullets) => {
   }, "");
 
   str += bullets.reduce((str, bullet) => {
+    if(bullet.x < 0 || bullet.y < 0) return;
     str += "?";
     str += convertBase(Math.floor(bullet.x), 10, 64) + "=";
     str += convertBase(Math.floor(bullet.y), 10, 64);
@@ -78,30 +79,19 @@ mainEmitter.on("map", newMap => {
   map = newMap;
 });
 
-mainEmitter.on("players", newPlayers => players = newPlayers);
+mainEmitter.on("players", newPlayers => {
+  console.log("switching from", players, "to", newPlayers);
+  players = newPlayers;
+});
 mainEmitter.on("bullets", newBullets => bullets = newBullets);
 
 let tickCounter = 0;
 
 mainEmitter.prependListener("removeUser", id => {
+  console.log("RIP");
   wss.broadcast({
     type: "removePlayer",
     data: id
-  });
-});
-
-mainEmitter.on("newUser", () => {
-  let newUser = players[players.length - 1];
-  wss.broadcast({
-    type: "newUser",
-    data: {
-      x: newUser.x,
-      y: newUser.y,
-      width: newUser.width,
-      height: newUser.height,
-      color: newUser.color,
-      id: newUser.id
-    }
   });
 });
 
@@ -111,31 +101,8 @@ mainEmitter.on("tick", () => {
   if(tickCounter % tickSkip === 0){
     wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
-        if(!JSON.stringify(stringifyResponse(players, bullets)).trim()) throw stringifyResponse(players, bullets);
+        if(!stringifyResponse(players, bullets).trim()) return;
         client.send(stringifyResponse(players, bullets));
-      }
-    });
-    wss.broadcast({
-      type: "tick",
-      data: {
-        players: players.map(player => ({
-          x: player.x,
-          y: player.y,
-          width: player.width,
-          height: player.height,
-          direction: player.direction,
-          fillColor: player.fillColor,
-          id: player.id
-        })),
-        bullets: bullets.map(bullet => ({
-          x: bullet.x,
-          y: bullet.y,
-          width: bullet.width,
-          height: bullet.height,
-          size: bullet.size,
-          direction: bullet.direction,
-          fillColor: bullet.fillColor
-        }))
       }
     });
   }
@@ -143,10 +110,48 @@ mainEmitter.on("tick", () => {
   tickCounter ++;
 });
 
+mainEmitter.on("userAdded", newUser => {
+  console.log("new user");
+  wss.clients.forEach(c => {
+    if(c && c.id && c.id === newUser.id){
+      console.log(c.id);
+      c.send(JSON.stringify([
+        {
+          type: "players",
+          data: players.map(player => ({
+            x: player.x,
+            y: player.y,
+            width: player.width,
+            height: player.height,
+            fillColor: player.fillColor,
+            id: player.id,
+            direction: player.direction
+          }))
+        }
+      ]));
+    }else{
+      c.send(JSON.stringify([{
+        type: "newUser",
+        data: {
+          x: newUser.x,
+          y: newUser.y,
+          width: newUser.width,
+          height: newUser.height,
+          fillColor: newUser.fillColor,
+          id: newUser.id,
+          direction: newUser.direction
+        }
+      }]));
+    }
+  });
+});
+
 wss.on("connection", function connection(ws) {
   const send = (...data) => {
     if(ws.readyState !== WebSocket.OPEN) return;
-    if(!JSON.stringify(data).trim()) throw data;
+
+    //there might not be data
+    if(!JSON.stringify(data).trim()) return;
     ws.send(JSON.stringify(data));
   };
   ws.on("message", function incoming(data) {
@@ -157,9 +162,18 @@ wss.on("connection", function connection(ws) {
           switch(data.type){
           case "hello":
             ws.id = Math.floor(Math.random() * 32768);
-            send({type: "map", data: map}, {type: "playerinfo", data: {
-              id: ws.id
-            }});
+            send(
+              {
+                type: "map",
+                data: map
+              }, {
+                type: "playerinfo",
+                data: {
+                  id: ws.id
+                }
+              }
+            );
+
             mainEmitter.emit("newUser", ws.id);
             break;
           case "keyDown":
@@ -198,7 +212,7 @@ wss.on("connection", function connection(ws) {
     }
   });
   ws.on("close", () => {
-    console.log("removing user", ws.id);
+    console.log("removing user due to connection close", ws.id);
     mainEmitter.emit("removeUser", ws.id);
   });
   ws.on("error", err => console.error("ERROR", err));
