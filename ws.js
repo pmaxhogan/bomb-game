@@ -95,14 +95,22 @@ mainEmitter.prependListener("removeUser", id => {
   });
 });
 
+let lastResponse;
+
 mainEmitter.on("tick", () => {
   if(!players) return;
+
+  let response = stringifyResponse(players, bullets);
+
+  if(response === lastResponse) return;
+
+  lastResponse = response;
 
   if(tickCounter % tickSkip === 0){
     wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
-        if(!stringifyResponse(players, bullets).trim()) return;
-        client.send(stringifyResponse(players, bullets));
+        if(!response.trim()) return;
+        client.send(response);
       }
     });
   }
