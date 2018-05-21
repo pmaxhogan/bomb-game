@@ -380,7 +380,7 @@ mainEmitter.on("newUser", id => {
   let validLocation = false;
   while(!validLocation){
     const x = Math.round((Math.random() * (width - 2) + 1)) * blockWidth;
-    const y = Math.round((Math.random() * (height - 1) + 1)) * blockWidth;
+    const y = Math.round((Math.random() * (height - 2) + 1)) * blockWidth;
     const player = new Player(x, y, blockWidth, blockWidth, id);
     if(playerCollisionCheck(realCollisionBoxes(player))){
       validLocation = false;
