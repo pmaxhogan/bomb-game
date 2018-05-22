@@ -122,6 +122,7 @@ class Player {
     if(players.length === 1){
       players.pop();
     }else{
+      if(players.indexOf(this) < 0) return;
       players.splice(players.indexOf(this), 1);
     }
   }
@@ -407,9 +408,9 @@ mainEmitter.on("newUser", id => {
 });
 
 mainEmitter.on("removeUser", id => {
-  players.forEach((player, idx) => {
+  players.forEach((player) => {
     if(player.id === id){
-      players.splice(idx, 1);
+      player.kill();
     }
   });
 });
