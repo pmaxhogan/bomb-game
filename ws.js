@@ -133,7 +133,8 @@ mainEmitter.on("userAdded", newUser => {
             height: player.height,
             fillColor: player.fillColor,
             id: player.id,
-            direction: player.direction
+            direction: player.direction,
+            username: player.username
           }))
         }
       ]));
@@ -147,7 +148,8 @@ mainEmitter.on("userAdded", newUser => {
           height: newUser.height,
           fillColor: newUser.fillColor,
           id: newUser.id,
-          direction: newUser.direction
+          direction: newUser.direction,
+          username: newUser.username
         }
       }]));
     }

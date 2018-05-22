@@ -96,6 +96,10 @@ const realCollisionBoxes = player => {
   });
 };
 
+const userData = require("./users.json");
+
+const randUsername = () => userData.reduce((acc, row) => acc + row.data[Math.floor(Math.random() * row.data.length)], "");
+
 class Player {
   constructor(x, y, width, height, id) {
     this.shotCooldown = 10;
@@ -108,6 +112,7 @@ class Player {
     this.id = id;
     this.direction = "up";
     this.shotCooldown = 0;
+    this.username = randUsername();
   }
   draw() {
     this.shotCooldown --;
