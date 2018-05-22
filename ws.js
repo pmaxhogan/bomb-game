@@ -135,7 +135,7 @@ mainEmitter.on("userAdded", newUser => {
             id: player.id,
             direction: player.direction,
             username: player.username,
-            killStreak: newUser.killStreak
+            killStreak: player.killStreak
           }))
         }
       ]));
