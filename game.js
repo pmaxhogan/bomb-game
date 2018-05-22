@@ -102,6 +102,7 @@ const randUsername = () => userData.reduce((acc, row) => acc + row.data[Math.flo
 
 class Player {
   constructor(x, y, width, height, id) {
+    this.killStreak = 0;
     this.shotCooldown = 10;
     this.collisionBoxes = [[0, 0, width, height]];
     this.width = width;
@@ -118,7 +119,6 @@ class Player {
     this.shotCooldown --;
   }
   kill(){
-    // alert("RIP " + this.fillColor);
     if(players.length === 1){
       players.pop();
     }else{
@@ -207,8 +207,16 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
   if(collision){
     if(collision instanceof Player){
       if(bullet.player !== collision){
-        players.splice(players.indexOf(collision), 1);
+        bullet.player.killStreak ++;
+        collision.kill();
         bullet.remove();
+        mainEmitter.emit("kill", {
+          type: "kill",
+          data: {
+            killer: bullet.player.id,
+            victim: collision.id
+          }
+        });
         return newVal;
       }else{
         log("Bullet hit owner.");

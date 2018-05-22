@@ -134,7 +134,8 @@ mainEmitter.on("userAdded", newUser => {
             fillColor: player.fillColor,
             id: player.id,
             direction: player.direction,
-            username: player.username
+            username: player.username,
+            killStreak: newUser.killStreak
           }))
         }
       ]));
@@ -149,12 +150,15 @@ mainEmitter.on("userAdded", newUser => {
           fillColor: newUser.fillColor,
           id: newUser.id,
           direction: newUser.direction,
-          username: newUser.username
+          username: newUser.username,
+          killStreak: newUser.killStreak
         }
       }]));
     }
   });
 });
+
+mainEmitter.on("kill", data => wss.broadcast(data));
 
 wss.on("connection", function connection(ws) {
   const send = (...data) => {
