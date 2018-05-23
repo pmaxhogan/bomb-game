@@ -361,21 +361,40 @@ const draw = () => {
   }
   isRunning = true;
 
+  const promises = [];
 
-  players.forEach(player => {
-    if(keys[player.id]){
-      Object.keys(keys[player.id]).forEach(key => {
-        if(key && keys[player.id][key]) player.onKeyDown(key);
+  promises.push(new Promise(resolve =>
+    setImmediate(() => {
+      players.forEach(player => {
+        if(keys[player.id]){
+          Object.keys(keys[player.id]).forEach(key => {
+            if(key && keys[player.id][key]) player.onKeyDown(key);
+          });
+        }
+        player.draw();
       });
-    }
-    player.draw();
+      resolve();
+    })
+  ));
+  promises.push(new Promise(resolve =>
+    setImmediate(() => {
+      blocks.forEach(block => block.draw());
+      resolve();
+    })
+  ));
+  promises.push(new Promise(resolve =>
+    setImmediate(() => {
+      bullets.forEach(bullet => bullet.draw());
+      resolve();
+    })
+  ));
+
+  Promise.all(promises).then(() => {
+
+    isRunning = false;
+
+    mainEmitter.emit("tick");
   });
-  blocks.forEach(block => block.draw());
-  bullets.forEach(bullet => bullet.draw());
-
-  isRunning = false;
-
-  mainEmitter.emit("tick");
 };
 
 setInterval(draw, 1000 / 60);
