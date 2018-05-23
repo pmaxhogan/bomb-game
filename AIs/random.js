@@ -16,7 +16,7 @@ const connect = () => {
     };
     setInterval(() => pressKey(keys[Math.floor(Math.random() * keys.length)], Math.floor(Math.random() * 500)), 250);
 
-    setInterval(() => send([{type: "keyPress", data: "q"}]), 250);
+    setInterval(() => send([{type: "keyPress", data: "q"}]), 150);
 
 
     let players = null;
@@ -40,7 +40,7 @@ const connect = () => {
             if(player.id === id){
               if(message.data.victim === player.username){
                 ws.close();
-                connect();
+                setTimeout(connect, 750);
               }
               return true;
             }
