@@ -355,6 +355,27 @@ const drawNoise = (x, y, w, h, density) => {
 
 const bullets = [];
 
+
+const _cache = {};
+const getPlayerById = id => {
+  if(_cache[id] && process.hrtime(_cache[id].time)[0] < 30){
+    return _cache[id].player;
+  }else{
+    let foundPlayer;
+    players.some(player => {
+      if(player.id === id){
+        foundPlayer = player;
+        return true;
+      }
+    });
+    _cache[id] = {
+      player: foundPlayer,
+      time: process.hrtime()
+    };
+    return foundPlayer;
+  }
+};
+
 const draw = () => {
   if(isRunning){
     throw new Error("OOF");
@@ -408,6 +429,7 @@ mainEmitter.on("ready", () => {
     });
     mainEmitter.emit("players", players);
     mainEmitter.emit("bullets", bullets);
+    mainEmitter.emit("getPlayerById", getPlayerById);
   }, 1);
 });
 
@@ -428,11 +450,8 @@ mainEmitter.on("newUser", id => {
 });
 
 mainEmitter.on("removeUser", id => {
-  players.forEach((player) => {
-    if(player.id === id){
-      player.kill();
-    }
-  });
+  const player = getPlayerById(id);
+  if(player) player.kill();
 });
 
 const keys = {};
@@ -440,11 +459,7 @@ const keys = {};
 const getEmitterFunc = (isKeyDown) => {
   return data => {
     if(data.key.slice(0, 5) === "arrow"){
-      players.forEach((player) => {
-        if(player.id === data.id){
-          player.direction = data.key.slice(5);
-        }
-      });
+      getPlayerById(data.id).direction = data.key.slice(5);
       return;
     }
 
@@ -473,11 +488,6 @@ mainEmitter.on("keyUp", getEmitterFunc(false));
 
 mainEmitter.on("keyPress", data => {
   if(data.key === "q"){
-    players.some((player) => {
-      if(player.id === data.id){
-        player.shoot();
-        return true;
-      }
-    });
+    getPlayerById(data.id).shoot();
   }
 });

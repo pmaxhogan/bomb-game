@@ -73,6 +73,8 @@ let map;
 let players;
 let bullets;
 
+let getPlayerById = null;
+
 mainEmitter.emit("ready");
 
 mainEmitter.on("map", newMap => {
@@ -83,6 +85,7 @@ mainEmitter.on("players", newPlayers => {
   players = newPlayers;
 });
 mainEmitter.on("bullets", newBullets => bullets = newBullets);
+mainEmitter.on("getPlayerById", func => getPlayerById = func);
 
 let tickCounter = 0;
 
