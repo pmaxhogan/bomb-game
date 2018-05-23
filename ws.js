@@ -80,7 +80,6 @@ mainEmitter.on("map", newMap => {
 });
 
 mainEmitter.on("players", newPlayers => {
-  console.log("switching from", players, "to", newPlayers);
   players = newPlayers;
 });
 mainEmitter.on("bullets", newBullets => bullets = newBullets);
@@ -88,7 +87,6 @@ mainEmitter.on("bullets", newBullets => bullets = newBullets);
 let tickCounter = 0;
 
 mainEmitter.prependListener("removeUser", id => {
-  console.log("RIP");
   wss.broadcast({
     type: "removePlayer",
     data: id
@@ -119,10 +117,9 @@ mainEmitter.on("tick", () => {
 });
 
 mainEmitter.on("userAdded", newUser => {
-  console.log("new user");
+  console.log("new user added", newUser.username);
   wss.clients.forEach(c => {
     if(c && c.id && c.id === newUser.id){
-      console.log(c.id);
       c.send(JSON.stringify([
         {
           type: "players",
@@ -188,6 +185,7 @@ wss.on("connection", function connection(ws) {
               }
             );
 
+            console.log("hello new user!", ws.id);
             mainEmitter.emit("newUser", ws.id);
             break;
           case "keyDown":
@@ -247,7 +245,6 @@ wss.on("connection", function connection(ws) {
 setInterval(function ping() {
   wss.clients.forEach(function each(ws) {
     if (ws.isAlive === false || ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED){
-      console.log("Terminating", ws.id);
       if(ws.id) mainEmitter.emit("removeUser", ws.id);
       return ws.terminate();
     }

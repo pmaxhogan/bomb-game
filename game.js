@@ -214,7 +214,10 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
         mainEmitter.emit("kill", {
           type: "kill",
           data: {
-            killer: bullet.player.id,
+            killer: {
+              id: bullet.player.id,
+              killStreak: bullet.player.killStreak
+            },
             victim: collision.id
           }
         });
@@ -379,7 +382,6 @@ setInterval(draw, 1000 / 60);
 module.exports = mainEmitter;
 
 mainEmitter.on("ready", () => {
-  console.log("ready");
   setTimeout(() => {
     mainEmitter.emit("map", {
       blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
@@ -390,7 +392,6 @@ mainEmitter.on("ready", () => {
 });
 
 mainEmitter.on("newUser", id => {
-  console.log("new user", id);
   let validLocation = false;
   while(!validLocation){
     const x = Math.round((Math.random() * (width - 2) + 1)) * blockWidth;
@@ -403,7 +404,6 @@ mainEmitter.on("newUser", id => {
       players.push(player);
     }
   }
-  console.log(players);
   mainEmitter.emit("userAdded", players[players.length - 1]);
 });
 
@@ -452,7 +452,6 @@ mainEmitter.on("keyDown", getEmitterFunc(true));
 mainEmitter.on("keyUp", getEmitterFunc(false));
 
 mainEmitter.on("keyPress", data => {
-  console.log(data);
   if(data.key === "q"){
     players.some((player) => {
       if(player.id === data.id){
