@@ -8,12 +8,13 @@ const mainEmitter = new __MyEmitter();
 
 // const colors = ["red", "orange", "#f7ec4f", "green", "blue", "black", "purple"];
 
-let speed = 2.5;
+let speed = 5;
 
 const width = 100;
 const height = 100;
 const bulletSize = 5;
-const bulletSpeed = 10;
+const bulletSpeed = 20;
+const maxShotCooldown = 7;
 
 const doLog = false;
 const log = (...args) => {
@@ -103,7 +104,7 @@ const randUsername = () => userData.reduce((acc, row) => acc + row.data[Math.flo
 class Player {
   constructor(x, y, width, height, id) {
     this.killStreak = 0;
-    this.shotCooldown = 10;
+    this.shotCooldown = maxShotCooldown;
     this.collisionBoxes = [[0, 0, width, height]];
     this.width = width;
     this.height = height;
@@ -149,7 +150,7 @@ class Player {
     if(this.shotCooldown > 0) return;
     log("shoot");
     bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
-    this.shotCooldown = 20;
+    this.shotCooldown = maxShotCooldown;
   }
 
   get x() {
