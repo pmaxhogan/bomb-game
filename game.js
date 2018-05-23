@@ -429,7 +429,6 @@ mainEmitter.on("ready", () => {
     });
     mainEmitter.emit("players", players);
     mainEmitter.emit("bullets", bullets);
-    mainEmitter.emit("getPlayerById", getPlayerById);
   }, 1);
 });
 
