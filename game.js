@@ -14,7 +14,7 @@ const width = 100;
 const height = 100;
 const bulletSize = 5;
 const bulletSpeed = 20;
-const maxShotCooldown = 1000;
+const maxShotCooldown = 375;// ms
 
 const doLog = false;
 const log = (...args) => {
