@@ -1,6 +1,6 @@
 const WebSocket = require("uws");
 const connect = () => {
-  const ws = new WebSocket("ws://127.0.0.1:8080");
+  const ws = new WebSocket("ws://35.227.26.151:8080");
   let id = null;
 
   ws.on("open", () => {
@@ -46,15 +46,17 @@ const connect = () => {
             }
           });
           break;
-        default:
-          console.log(message);
         }
       });
     });
   });
 
 
-  ws.on("error", console.error);
+  ws.on("error", () => {
+    console.log("reconnecting...");
+    ws.close();
+    setTimeout(connect, 750);
+  });
   ws.on("unexpected-response", console.error);
 };
 
