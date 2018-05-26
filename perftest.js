@@ -25,6 +25,7 @@ const connect = () => {
   ws.on("message", msg => {
     if(msg[0] !== "?" && msg[0] !== "!") return;
     const time = clock(lastTime);
+    if(time === 0) return;
     times.push(time);
     // console.log(time);
     lastTime = clock();
