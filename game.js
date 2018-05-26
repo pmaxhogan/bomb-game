@@ -120,6 +120,7 @@ class Player {
     this.shotCooldown --;
   }
   kill(){
+    this.isDead = true;
     if(players.length === 1){
       players.pop();
     }else{
@@ -251,6 +252,8 @@ class Bullet {
     this.player = player;
   }
   draw(){
+    if(this.player.isDead) return this.remove();
+
     if(this.x <= 0 || this.y <= 0 || this.x > (width * blockWidth) + 100  || this.y > (height * blockWidth) + 100){
       return this.remove();
     }
