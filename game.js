@@ -378,7 +378,7 @@ const getPlayerById = id => {
 
 const draw = () => {
   if(isRunning){
-    throw new Error("OOF");
+    console.error("frame skipping");
   }
   isRunning = true;
 
@@ -487,6 +487,7 @@ mainEmitter.on("keyUp", getEmitterFunc(false));
 
 mainEmitter.on("keyPress", data => {
   if(data.key === "q"){
-    getPlayerById(data.id).shoot();
+    const player = getPlayerById(data.id);
+    if(player) player.shoot();
   }
 });
