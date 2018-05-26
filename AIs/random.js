@@ -1,6 +1,6 @@
 const WebSocket = require("uws");
 const connect = () => {
-  const ws = new WebSocket("ws://35.227.26.151:8080");
+  const ws = new WebSocket("ws://" + process.env.SERVER_IP + ":8080");
   let id = null;
 
   ws.on("open", () => {
