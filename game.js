@@ -14,7 +14,7 @@ const width = 100;
 const height = 100;
 const bulletSize = 5;
 const bulletSpeed = 20;
-const maxShotCooldown = 7;
+const maxShotCooldown = 1000;
 
 const doLog = false;
 const log = (...args) => {
@@ -104,7 +104,6 @@ const randUsername = () => userData.reduce((acc, row) => acc + row.data[Math.flo
 class Player {
   constructor(x, y, width, height, id) {
     this.killStreak = 0;
-    this.shotCooldown = maxShotCooldown;
     this.collisionBoxes = [[0, 0, width, height]];
     this.width = width;
     this.height = height;
@@ -115,9 +114,9 @@ class Player {
     this.direction = "up";
     this.shotCooldown = 0;
     this.username = randUsername();
+    this.lastShot = Date.now();
   }
   draw() {
-    this.shotCooldown --;
   }
   kill(){
     this.isDead = true;
@@ -148,10 +147,10 @@ class Player {
   }
 
   shoot(){
-    if(this.shotCooldown > 0) return;
+    if(Date.now() - this.lastShot < maxShotCooldown) return;
+    this.lastShot = Date.now();
     log("shoot");
     bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
-    this.shotCooldown = maxShotCooldown;
   }
 
   get x() {
