@@ -457,10 +457,12 @@ mainEmitter.on("removeUser", id => {
 
 const keys = {};
 
+const arrowKeys = ["up", "down", "left", "right"];
+
 const getEmitterFunc = (isKeyDown) => {
   return data => {
-    if(data.key.slice(0, 5) === "arrow"){
-      getPlayerById(data.id).direction = data.key.slice(5);
+    if(arrowKeys.includes(data.key)){
+      getPlayerById(data.id).direction = data.key;
       return;
     }
 
@@ -472,6 +474,7 @@ const getEmitterFunc = (isKeyDown) => {
     };
 
     const key = map[data.key];
+    if(!key) console.log(data.key, "not recognized");
     try {
       if(!keys[data.id]){
         keys[data.id] = {};
@@ -487,9 +490,7 @@ mainEmitter.on("keyDown", getEmitterFunc(true));
 
 mainEmitter.on("keyUp", getEmitterFunc(false));
 
-mainEmitter.on("keyPress", data => {
-  if(data.key === "q"){
-    const player = getPlayerById(data.id);
-    if(player) player.shoot();
-  }
+mainEmitter.on("shoot", data => {
+  const player = getPlayerById(data);
+  if(player) player.shoot();
 });

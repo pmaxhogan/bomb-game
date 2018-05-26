@@ -167,7 +167,6 @@ wss.on("connection", function connection(ws) {
   };
   ws.on("message", function incoming(data) {
     try{
-      const validKeys = ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"];
       JSON.parse(data).forEach(data => {
         try{
           switch(data.type){
@@ -189,28 +188,19 @@ wss.on("connection", function connection(ws) {
             mainEmitter.emit("newUser", ws.id);
             break;
           case "keyDown":
-            if(validKeys.includes(data.data)){
-              mainEmitter.emit("keyDown", {
-                key: data.data,
-                id: ws.id
-              });
-            }
+            mainEmitter.emit("keyDown", {
+              key: data.data,
+              id: ws.id
+            });
             break;
           case "keyUp":
-            if(validKeys.includes(data.data)){
-              mainEmitter.emit("keyUp", {
-                key: data.data,
-                id: ws.id
-              });
-            }
+            mainEmitter.emit("keyUp", {
+              key: data.data,
+              id: ws.id
+            });
             break;
-          case "keyPress":
-            if(data.data === "q"){
-              mainEmitter.emit("keyPress", {
-                key: data.data,
-                id: ws.id
-              });
-            }
+          case "shoot":
+            mainEmitter.emit("shoot", ws.id);
             break;
           default:
             throw new Error("Unknown WS protocol type", data.type);
