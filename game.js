@@ -43,9 +43,6 @@ class Block {
     this.height = height;
     this.collisionBoxes = [[0, 0, width, height]];
   }
-  draw(){
-    // TODO: code here?
-  }
 }
 
 const playerCollisionCheck = (playerCollisionBoxes, objsToTest = blocks) => {
@@ -115,8 +112,6 @@ class Player {
     this.shotCooldown = 0;
     this.username = randUsername();
     this.lastShot = Date.now();
-  }
-  draw() {
   }
   kill(){
     this.isDead = true;
@@ -384,40 +379,18 @@ const draw = () => {
   }
   isRunning = true;
 
-  const promises = [];
-
-  promises.push(new Promise(resolve =>
-    setImmediate(() => {
-      players.forEach(player => {
-        if(keys[player.id]){
-          Object.keys(keys[player.id]).forEach(key => {
-            if(key && keys[player.id][key]) player.onKeyDown(key);
-          });
-        }
-        player.draw();
+  players.forEach(player => {
+    if(keys[player.id]){
+      Object.keys(keys[player.id]).forEach(key => {
+        if(key && keys[player.id][key]) player.onKeyDown(key);
       });
-      resolve();
-    })
-  ));
-  promises.push(new Promise(resolve =>
-    setImmediate(() => {
-      blocks.forEach(block => block.draw());
-      resolve();
-    })
-  ));
-  promises.push(new Promise(resolve =>
-    setImmediate(() => {
-      bullets.forEach(bullet => bullet.draw());
-      resolve();
-    })
-  ));
-
-  Promise.all(promises).then(() => {
-
-    isRunning = false;
-
-    mainEmitter.emit("tick");
+    }
   });
+  bullets.forEach(bullet => bullet.draw());
+
+  isRunning = false;
+
+  mainEmitter.emit("tick");
 };
 
 setInterval(draw, 1000 / 60);
