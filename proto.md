@@ -10,7 +10,7 @@ This is a player Fifteen bits of player x (int part) Fifteen bits of player y (i
 This is a player Fifteen bits of player x (int part) Fifteen bits of player y (int part) Fifteen bits of player UUID Two bits of direction*
 
 1                011010101011011                     011010101011011                     11
-This is a bullet Fifteen bits of bullet x (int part) Fifteen bits of bullet x (int part) Two bits of direction
+This is a bomb Fifteen bits of bomb x (int part) Fifteen bits of bomb x (int part) Two bits of direction
 ```
 
 Notes:
@@ -20,4 +20,4 @@ Notes:
 	1. Down
 	2. Left
 	3. Right
- - The message will always start with one or more players, followed by zero or more bullets.
+ - The message will always start with one or more players, followed by zero or more bombs.

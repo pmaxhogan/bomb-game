@@ -3,7 +3,7 @@ const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
 
 // 1 out of every n ticks is sent to the client.
 const tickSkip = 1;
-const WebSocket = require("uws");
+const WebSocket = require("@kapouer/uws");
 
 const wss = new WebSocket.Server({ port: process.env.PORT || 8080, host: process.env.HOST || "127.0.0.1" });
 
@@ -31,7 +31,7 @@ const convertBase = (value, from_base, to_base) => {
   return new_value || "0";
 };
 
-const stringifyResponse = (players, bullets) => {
+const stringifyResponse = (players, bombs) => {
   let str = "";
 
   str += players.reduce((str, player) => {
@@ -48,11 +48,11 @@ const stringifyResponse = (players, bullets) => {
     return str;
   }, "");
 
-  str += bullets.reduce((str, bullet) => {
-    if(bullet.x < 0 || bullet.y < 0) return;
+  str += bombs.reduce((str, bomb) => {
+    if(bomb.x < 0 || bomb.y < 0) return;
     str += "?";
-    str += convertBase(Math.floor(bullet.x), 10, 64) + "=";
-    str += convertBase(Math.floor(bullet.y), 10, 64);
+    str += convertBase(Math.floor(bomb.x), 10, 64) + "=";
+    str += convertBase(Math.floor(bomb.y), 10, 64);
     return str;
   }, "");
 
@@ -71,7 +71,7 @@ wss.broadcast = function broadcast(...data) {
 
 let map;
 let players;
-let bullets;
+let bombs;
 
 mainEmitter.emit("ready");
 
@@ -82,7 +82,7 @@ mainEmitter.on("map", newMap => {
 mainEmitter.on("players", newPlayers => {
   players = newPlayers;
 });
-mainEmitter.on("bullets", newBullets => bullets = newBullets);
+mainEmitter.on("bombs", newbombs => bombs = newbombs);
 
 let tickCounter = 0;
 
@@ -98,7 +98,7 @@ let lastResponse;
 mainEmitter.on("tick", () => {
   if(!players) return;
 
-  let response = stringifyResponse(players, bullets);
+  let response = stringifyResponse(players, bombs);
 
   if(response === lastResponse) return;
 
@@ -199,8 +199,8 @@ wss.on("connection", function connection(ws) {
               id: ws.id
             });
             break;
-          case "shoot":
-            mainEmitter.emit("shoot", ws.id);
+          case "bomb":
+            mainEmitter.emit("bomb", ws.id);
             break;
           default:
             throw new Error("Unknown WS protocol type", data.type);
