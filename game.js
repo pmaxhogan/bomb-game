@@ -8,14 +8,16 @@ const mainEmitter = new __MyEmitter();
 
 // const colors = ["red", "orange", "#f7ec4f", "green", "blue", "black", "purple"];
 
+
+
 let speed = 5;
 
-const width = 100;
-const height = 100;
+const width = 5;//100
+const height = 4;//100
 const bombSize = 5;
 const bombSpeed = 20;
 const maxShotCooldown = 375;// ms
-const bombTime = 275;
+const bombTime = 100;
 
 const doLog = false;
 const log = (...args) => {
@@ -24,7 +26,7 @@ const log = (...args) => {
   }
 };
 
-const roundToTheNearest(num, nearest) => Math.round(num / nearest) * nearest;
+const roundToTheNearest = (num, nearest) => Math.round(num / nearest) * nearest;
 
 const isCollision = (rect1, rect2) => {
   if (
@@ -47,9 +49,11 @@ class Block {
     this.collisionBoxes = [[0, 0, width, height]];
   }
   destroy(){
-    let index = bombs.indexOf(this);
+    console.log("removing block");
+    let index = blocks.indexOf(this);
     if (index > -1) {
-      bombs.splice(index, 1);
+      blocks.splice(index, 1);
+      console.log("removed block");
     }
   }
 }
@@ -200,10 +204,12 @@ class Bomb {
     this.collisionBoxes = [[-this.size / 2, -this.size / 2, this.size / 2, this.size / 2]];
     this.player = player;
     this.timeLeft = bombTime;
+    this.explosionSize = 3;
   }
   draw(){
     this.timeLeft --;
     if(this.timeLeft === 0){
+      console.log("EXPLODING");
       this.explode();
     }
     // if(this.player.isDead) return this.remove();
@@ -245,17 +251,35 @@ class Bomb {
       [0, 1],
       [0, -1]
     ];
+    
+    let blocksDestroyed = [];
     masks.forEach(mask => {
       let startX = this.x;
       let startY = this.y;
-      const tries = 0;
+      let tries = 0;
 
       let blockFound = false;
       while(!blockFound && tries < this.explosionSize){
         tries++;
-        blocks.filter(block => block.x === startX && block.y === startY)
+        console.log("my coords are", startX, startY);
+        const found = blocks.filter(block => {
+            console.log(block.x, block.y);
+            return block.x === startX && block.y === startY;
+        });
+        if(found && found.length){
+          console.log("FOUND BLOWN BLOCKS", found.length);
+          blockFound = true;
+          blocksDestroyed.push(...found.map(block => [block.x, block.y]));
+          found.forEach(block => block.destroy());
+        }else{
+          startX += mask[0] * blockWidth;
+          startY += mask[1] * blockWidth;
+        }
       }
     });
+    console.log("destroyed", blocksDestroyed);
+    mainEmitter.emit("explosion", {size: this.explosionSize, x: this.x, y: this.y, blocksDestroyed});
+    this.remove();
   }
 }
 
@@ -263,7 +287,7 @@ const blocks = [];
 
 const blockWidth = 20;
 
-const map = require("fs").readFileSync(__dirname + "/maps/map1.txt").toString();
+const map = require("fs").readFileSync(__dirname + "/maps/map3.txt").toString();
 
 map.split("\n").forEach((line, lineNumber) => {
   line.split("").forEach((char, idx) => {

@@ -17,7 +17,6 @@ const convertBase = (value, from_base, to_base) => {
 
   var dec_value = value.split("").reverse().reduce(function (carry, digit, index) {
     if (from_range.indexOf(digit) === -1){
-      console.trace();
       throw new Error("Invalid digit `"+digit+"` for base "+from_base+".");
     }
     return carry += from_range.indexOf(digit) * (Math.pow(from_base, index));
@@ -36,8 +35,8 @@ const stringifyResponse = (players, bombs) => {
 
   str += players.reduce((str, player) => {
     str += "!";
-    str += convertBase(Math.floor(player.x), 10, 64) + "=";
-    str += convertBase(Math.floor(player.y), 10, 64) + "=";
+    str += convertBase(Math.floor(Math.max(player.x, 0)), 10, 64) + "=";
+    str += convertBase(Math.floor(Math.max(player.y, 0)), 10, 64) + "=";
     str += convertBase(Math.floor(player.id), 10, 64) + "=";
     str += ({
       "up": "u",
@@ -90,6 +89,13 @@ mainEmitter.prependListener("removeUser", id => {
   wss.broadcast({
     type: "removePlayer",
     data: id
+  });
+});
+
+mainEmitter.on("explosion", data => {
+  wss.broadcast({
+    type: "explosion",
+    data
   });
 });
 
