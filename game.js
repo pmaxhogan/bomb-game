@@ -55,6 +55,7 @@ class Block {
       blocks.splice(index, 1);
       console.log("removed block");
     }
+    mainEmitter.emit("removeBlock", [this.x, this.y]);
   }
 }
 

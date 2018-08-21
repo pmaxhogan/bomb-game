@@ -78,6 +78,12 @@ mainEmitter.on("map", newMap => {
   map = newMap;
 });
 
+mainEmitter.on("removeBlock", destroyed => {
+    const broken = map.blocks.filter(block => destroyed[0] === block[0] && destroyed[1] === block[1])[0];
+    const index = map.blocks.indexOf(broken);
+    if(index) map.blocks.splice(index, 1);
+});
+
 mainEmitter.on("players", newPlayers => {
   players = newPlayers;
 });
