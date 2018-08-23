@@ -12,8 +12,8 @@ const mainEmitter = new __MyEmitter();
 
 let speed = 5;
 
-const width = 5;//100
-const height = 4;//100
+const width = 100;
+const height = 100;
 const bombSize = 5;
 const bombSpeed = 20;
 const maxShotCooldown = 375;// ms
@@ -50,12 +50,16 @@ class Block {
   }
   destroy(){
     console.log("removing block");
+    if(this.x === 0 || this.y === 0 || this.x === (width - 1) * blockWidth || this.y === (height - 1) * blockWidth){//on the edge of the map
+      return false;
+    }
     let index = blocks.indexOf(this);
     if (index > -1) {
       blocks.splice(index, 1);
       console.log("removed block");
     }
     mainEmitter.emit("removeBlock", [this.x, this.y]);
+    return true;
   }
 }
 
@@ -252,7 +256,7 @@ class Bomb {
       [0, 1],
       [0, -1]
     ];
-    
+
     let blocksDestroyed = [];
     masks.forEach(mask => {
       let startX = this.x;
@@ -288,7 +292,7 @@ const blocks = [];
 
 const blockWidth = 20;
 
-const map = require("fs").readFileSync(__dirname + "/maps/map3.txt").toString();
+const map = require("fs").readFileSync(__dirname + "/maps/map1.txt").toString();
 
 map.split("\n").forEach((line, lineNumber) => {
   line.split("").forEach((char, idx) => {
