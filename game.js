@@ -272,9 +272,7 @@ class Bomb {
         let blockFound = false;
         while(!blockFound && tries < this.explosionSize){
           tries++;
-          console.log("my coords are", startX, startY);
           const found = blocks.filter(block => {
-              console.log(block.x, block.y);
               return block.x === startX && block.y === startY;
           });
           if(found && found.length){
