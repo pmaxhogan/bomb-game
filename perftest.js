@@ -1,4 +1,4 @@
-const WebSocket = require("uws");
+const WebSocket = require("@kapouer/uws");
 
 function clock(start) {
   if ( !start ) return process.hrtime();
@@ -13,7 +13,7 @@ const connect = () => {
   console.log("connecting to", "ws://" + process.env.SERVER_IP + ":8080");
 
   ws.on("open", () => {
-    console.log("open");
+    console.log("Connected. Press Control+C to see statistics.");
     const send = data => ws.send(JSON.stringify(data));
 
     send([{type: "hello"}]);
@@ -38,7 +38,7 @@ const connect = () => {
 
 process.on("SIGINT", () => {
   const average = times.reduce((a, b) => a + b) / times.length;
-  console.log(average + "ms");
+  console.log("\n" + average + "ms");
   process.exit();
 });
 
