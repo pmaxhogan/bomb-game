@@ -274,8 +274,7 @@ class Bomb {
         if(found && found.length){
           console.log("FOUND BLOWN BLOCKS", found.length);
           blockFound = true;
-          blocksDestroyed.push(...found.map(block => [block.x, block.y]));
-          found.forEach(block => block.destroy());
+          blocksDestroyed.push(...found.filter(block => block.destroy()).map(block => [block.x, block.y]));
         }else{
           startX += mask[0] * blockWidth;
           startY += mask[1] * blockWidth;
