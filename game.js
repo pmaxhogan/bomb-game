@@ -163,7 +163,12 @@ class Player {
     if(Date.now() - this.lastShot < maxShotCooldown) return;
     this.lastShot = Date.now();
     log("bomb");
-    bombs.push(new Bomb(roundToTheNearest(this.x, blockWidth), roundToTheNearest(this.y, blockWidth), this));
+    const x = roundToTheNearest(this.x, blockWidth);
+    const y = roundToTheNearest(this.y, blockWidth);
+    setImmediate(() => {
+      if(!bombs.every(bomb => bomb.x !== x && bomb.y !== y)) return;
+      bombs.push(new Bomb(x, y, this));
+    });
   }
 
   get x() {
@@ -250,40 +255,42 @@ class Bomb {
   }
 
   explode(){
-    const masks = [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1]
-    ];
+    setImmediate(() => {
+      const masks = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1]
+      ];
 
-    let blocksDestroyed = [];
-    masks.forEach(mask => {
-      let startX = this.x;
-      let startY = this.y;
-      let tries = 0;
+      let blocksDestroyed = [];
+      masks.forEach(mask => {
+        let startX = this.x;
+        let startY = this.y;
+        let tries = 0;
 
-      let blockFound = false;
-      while(!blockFound && tries < this.explosionSize){
-        tries++;
-        console.log("my coords are", startX, startY);
-        const found = blocks.filter(block => {
-            console.log(block.x, block.y);
-            return block.x === startX && block.y === startY;
-        });
-        if(found && found.length){
-          console.log("FOUND BLOWN BLOCKS", found.length);
-          blockFound = true;
-          blocksDestroyed.push(...found.filter(block => block.destroy()).map(block => [block.x, block.y]));
-        }else{
-          startX += mask[0] * blockWidth;
-          startY += mask[1] * blockWidth;
+        let blockFound = false;
+        while(!blockFound && tries < this.explosionSize){
+          tries++;
+          console.log("my coords are", startX, startY);
+          const found = blocks.filter(block => {
+              console.log(block.x, block.y);
+              return block.x === startX && block.y === startY;
+          });
+          if(found && found.length){
+            console.log("FOUND BLOWN BLOCKS", found.length);
+            blockFound = true;
+            blocksDestroyed.push(...found.filter(block => block.destroy()).map(block => [block.x, block.y]));
+          }else{
+            startX += mask[0] * blockWidth;
+            startY += mask[1] * blockWidth;
+          }
         }
-      }
+      });
+      console.log("destroyed", blocksDestroyed);
+      mainEmitter.emit("explosion", {size: this.explosionSize, x: this.x, y: this.y, blocksDestroyed});
+      this.remove();
     });
-    console.log("destroyed", blocksDestroyed);
-    mainEmitter.emit("explosion", {size: this.explosionSize, x: this.x, y: this.y, blocksDestroyed});
-    this.remove();
   }
 }
 
