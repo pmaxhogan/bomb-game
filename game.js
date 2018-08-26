@@ -160,15 +160,13 @@ class Player {
   }
 
   bomb(){
-    if(Date.now() - this.lastShot < maxShotCooldown) return;
+    if(Date.now() - this.lastShot < maxShotCooldown) return log("Cooldown!");
     this.lastShot = Date.now();
     log("bomb");
     const x = roundToTheNearest(this.x, blockWidth);
     const y = roundToTheNearest(this.y, blockWidth);
-    setImmediate(() => {
-      if(!bombs.every(bomb => bomb.x !== x && bomb.y !== y)) return;
-      bombs.push(new Bomb(x, y, this));
-    });
+    if(bombs.some(bomb => bomb.x === x && bomb.y === y)) return log("already there!");
+    bombs.push(new Bomb(x, y, this));
   }
 
   get x() {
@@ -296,7 +294,7 @@ const blocks = [];
 
 const blockWidth = 20;
 
-const map = require("fs").readFileSync(__dirname + "/maps/map1.txt").toString();
+const map = require("fs").readFileSync(__dirname + "/maps/map2.txt").toString();
 
 map.split("\n").forEach((line, lineNumber) => {
   line.split("").forEach((char, idx) => {
