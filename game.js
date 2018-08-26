@@ -311,6 +311,30 @@ class Bomb {
             blockFound = true;
             blocksDestroyed.push(...found.filter(block => block.destroy()).map(block => [block.x, block.y]));
           }else{
+            players.forEach(player => {
+              const playerDead = isCollision(
+                player,
+                {
+                  x: startX,
+                  y: startY,
+                  width: this.size * 2,
+                  height: this.size * 2
+                }
+              );
+              if(playerDead){
+                mainEmitter.emit("kill", {
+                  type: "kill",
+                  data: {
+                    killer: {
+                      id: this.player.id,
+                      killStreak: this.player.killStreak
+                    },
+                    victim: player.username
+                  }
+                });
+                player.kill();
+              }
+            });
             startX += mask[0] * blockWidth;
             startY += mask[1] * blockWidth;
           }
