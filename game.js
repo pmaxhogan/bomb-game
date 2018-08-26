@@ -14,7 +14,8 @@ let speed = 5;
 
 const width = 100;
 const height = 100;
-const bombSize = 5;
+const blockWidth = 20;
+const bombSize = 10;
 const bombSpeed = 20;
 const maxShotCooldown = 375;// ms
 const bombTime = 100;
@@ -291,8 +292,6 @@ class Bomb {
 }
 
 const blocks = [];
-
-const blockWidth = 20;
 
 const map = require("fs").readFileSync(__dirname + "/maps/map2.txt").toString();
 
