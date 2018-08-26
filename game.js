@@ -64,9 +64,30 @@ class Block {
   }
 }
 
-const playerCollisionCheck = (playerCollisionBoxes, objsToTest = blocks) => {
+const playerCollisionCheck = (playerCollisionBoxes, objsToTest = blocks, player) => {
   let objCollidedWith = null;
   playerCollisionBoxes.some(playerBox => {
+    if(bombs.filter(bomb => bomb.hasWalkedOff || bomb.player !== player).some(bomb => {
+      if(isCollision(
+        {
+          x: playerBox[0],
+          y: playerBox[1],
+          width: playerBox[2],
+          height: playerBox[3]
+        },
+        {
+          x: bomb.x,
+          y: bomb.y,
+          width: bomb.size * 2,
+          height: bomb.size * 2
+        }
+      )){
+        objCollidedWith = bomb;
+        return true;
+      }
+    })){
+      return true;
+    }
     return objsToTest.some(block => {
       if(!block || !block.collisionBoxes){
         throw block;
@@ -84,7 +105,6 @@ const playerCollisionCheck = (playerCollisionBoxes, objsToTest = blocks) => {
           height: blockBox[3]
         })){
           objCollidedWith = block;
-          log("COLLISION", block);
           return true;
         }
       });
@@ -183,7 +203,7 @@ class Player {
       box[0] += newVal;
       box[1] += this.realY;
       return box;
-    }))){
+    }), blocks, this)){
       return newVal;
     }
     this.realX = newVal;
@@ -195,7 +215,7 @@ class Player {
       box[0] += this.realX;
       box[1] += newVal;
       return box;
-    }))){
+    }), blocks, this)){
       return newVal;
     }
     this.realY = newVal;
@@ -218,10 +238,22 @@ class Bomb {
   draw(){
     this.timeLeft --;
     if(this.timeLeft === 0){
-      console.log("EXPLODING");
+      log("EXPLODING");
       this.explode();
     }
     // if(this.player.isDead) return this.remove();
+
+    if(!players.some(player => isCollision(
+      player,
+      {
+        x: this.x,
+        y: this.y,
+        width: this.size * 2,
+        height: this.size * 2
+      }
+    ))){
+      this.hasWalkedOff = true;
+    }
 
     if(this.x <= 0 || this.y <= 0 || this.x > (width * blockWidth) + 100  || this.y > (height * blockWidth) + 100){
       return this.remove();
@@ -334,6 +366,9 @@ const drawNoise = (x, y, w, h, density) => {
             blocks.pop();
           }
         });
+    }
+  }
+};
       }
     }
   }
