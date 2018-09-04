@@ -79,9 +79,9 @@ mainEmitter.on("map", newMap => {
 });
 
 mainEmitter.on("removeBlock", destroyed => {
-    const broken = map.blocks.filter(block => destroyed[0] === block[0] && destroyed[1] === block[1])[0];
-    const index = map.blocks.indexOf(broken);
-    if(index) map.blocks.splice(index, 1);
+  const broken = map.blocks.filter(block => destroyed[0] === block[0] && destroyed[1] === block[1])[0];
+  const index = map.blocks.indexOf(broken);
+  if(index) map.blocks.splice(index, 1);
 });
 
 mainEmitter.on("players", newPlayers => {
@@ -101,6 +101,13 @@ mainEmitter.prependListener("removeUser", id => {
 mainEmitter.on("explosion", data => {
   wss.broadcast({
     type: "explosion",
+    data
+  });
+});
+
+mainEmitter.on("mapResetPending", data => {
+  wss.broadcast({
+    type: "mapResetPending",
     data
   });
 });
@@ -168,6 +175,12 @@ mainEmitter.on("userAdded", newUser => {
 });
 
 mainEmitter.on("kill", data => wss.broadcast(data));
+
+mainEmitter.on("mapReset", () => wss.broadcast(
+  {
+    type: "mapReset",
+    data: map
+  }));
 
 wss.on("connection", function connection(ws) {
   const send = (...data) => {

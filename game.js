@@ -17,6 +17,8 @@ const bombSize = 10;
 const bombSpeed = 20;
 const maxShotCooldown = 375;// ms
 const bombTime = 100;
+const minBlocksPercent = 0.25;
+const mapResetDelay = 5;// seconds
 
 const doLog = false;
 const log = (...args) => {
@@ -57,6 +59,7 @@ class Block {
       blocks.splice(index, 1);
       console.log("removed block");
     }
+    testMapReset();
     mainEmitter.emit("removeBlock", [this.x, this.y]);
     return true;
   }
@@ -345,22 +348,45 @@ class Bomb {
   }
 }
 
-const blocks = [];
+let blocks = [];
+let numBlocks = 0;
+let width = 0;
+let height = 0;
+let mapResetDate;
+let isResetting;
 
-const map = require("fs").readFileSync(__dirname + "/maps/map3.txt").toString();
-const split = map.trim().split("\n");
-const width = split.reduce((old, line) => Math.max(old, line.length), 0);
-const height = split.length;
-console.log(width, "x", height);
+const resetMap = (newMap = "map3") => {
+  blocks = [];
+  numBlocks = 0;
+  const map = require("fs").readFileSync(__dirname + "/maps/" + newMap + ".txt").toString();
+  const split = map.trim().split("\n");
+  width = split.reduce((old, line) => Math.max(old, line.length), 0);
+  height = split.length;
+  console.log(width, "x", height);
 
-split.forEach((line, lineNumber) => {
-  line.split("").forEach((char, idx) => {
-    if(char === "#"){
-      log(idx, lineNumber);
-      blocks.push(new Block(idx * blockWidth, lineNumber * blockWidth, blockWidth, blockWidth));
-    }
+  split.forEach((line, lineNumber) => {
+    line.split("").forEach((char, idx) => {
+      if(char === "#"){
+        log(idx, lineNumber);
+        numBlocks ++;
+        blocks.push(new Block(idx * blockWidth, lineNumber * blockWidth, blockWidth, blockWidth));
+      }
+    });
   });
-});
+};
+
+resetMap();
+
+const testMapReset = () => {
+  console.log(blocks.length / numBlocks, "out of", minBlocksPercent);
+  if(blocks.length / numBlocks < minBlocksPercent && !isResetting){
+    console.log("resetting map in", mapResetDelay);
+    mapResetDate = new Date();
+    isResetting = true;
+    mapResetDate.setSeconds(mapResetDate.getSeconds() + mapResetDelay);
+    mainEmitter.emit("mapResetPending", {date: mapResetDate.toString()});
+  }
+};
 
 const players = [];
 
@@ -430,8 +456,36 @@ const getPlayerById = id => {
 const draw = () => {
   if(isRunning){
     console.error("frame skipping");
+    return;
   }
   isRunning = true;
+
+  if(isResetting && mapResetDate.getTime() < (new Date()).getTime()){
+    console.log("reset!");
+    mapResetDate = undefined;
+    isResetting = false;
+    resetMap();
+
+    players.forEach(player => {
+      let validLocation = false;
+      while(!validLocation){
+        const x = Math.round((Math.random() * (width - 2) + 1)) * blockWidth;
+        const y = Math.round((Math.random() * (height - 2) + 1)) * blockWidth;
+        player.realX = x;
+        player.realY = y;
+        if(playerCollisionCheck(realCollisionBoxes(player))){
+          validLocation = false;
+        }else{
+          validLocation = true;
+        }
+      }
+    });
+
+    mainEmitter.emit("map", {
+      blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
+    });
+    mainEmitter.emit("mapReset");
+  }
 
   players.forEach(player => {
     if(keys[player.id]){
