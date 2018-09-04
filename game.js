@@ -12,8 +12,6 @@ const mainEmitter = new __MyEmitter();
 
 let speed = 5;
 
-const width = 100;
-const height = 100;
 const blockWidth = 20;
 const bombSize = 10;
 const bombSpeed = 20;
@@ -304,7 +302,7 @@ class Bomb {
         while(!blockFound && tries < this.explosionSize){
           tries++;
           const found = blocks.filter(block => {
-              return block.x === startX && block.y === startY;
+            return block.x === startX && block.y === startY;
           });
           if(found && found.length){
             console.log("FOUND BLOWN BLOCKS", found.length);
@@ -349,9 +347,13 @@ class Bomb {
 
 const blocks = [];
 
-const map = require("fs").readFileSync(__dirname + "/maps/map2.txt").toString();
+const map = require("fs").readFileSync(__dirname + "/maps/map3.txt").toString();
+const split = map.trim().split("\n");
+const width = split.reduce((old, line) => Math.max(old, line.length), 0);
+const height = split.length;
+console.log(width, "x", height);
 
-map.split("\n").forEach((line, lineNumber) => {
+split.forEach((line, lineNumber) => {
   line.split("").forEach((char, idx) => {
     if(char === "#"){
       log(idx, lineNumber);
