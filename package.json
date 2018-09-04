@@ -17,8 +17,8 @@
     "type": "git",
     "url": "git+https://github.com/programmer5000-com/pixel-shooter.git"
   },
-  "author": "programmer5000",
   "license": "AGPL-3.0",
+  "author": "programmer5000",
   "bugs": {
     "url": "https://github.com/programmer5000-com/pixel-shooter/issues"
   },
