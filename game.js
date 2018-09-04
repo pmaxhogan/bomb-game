@@ -17,8 +17,8 @@ const bombSize = 10;
 const bombSpeed = 20;
 const maxShotCooldown = 375;// ms
 const bombTime = 100;
-const minBlocksPercent = 0.25;
-const mapResetDelay = 5;// seconds
+const minBlocksPercent = 0.5;
+const mapResetDelay = 10;// seconds
 
 const doLog = false;
 const log = (...args) => {
