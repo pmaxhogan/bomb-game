@@ -22,8 +22,5 @@
   "bugs": {
     "url": "https://github.com/programmer5000-com/pixel-shooter/issues"
   },
-  "homepage": "https://github.com/programmer5000-com/pixel-shooter#readme",
-  "engines": {
-    "npm": "6.4.x"
-  }
+  "homepage": "https://github.com/programmer5000-com/pixel-shooter#readme"
 }
