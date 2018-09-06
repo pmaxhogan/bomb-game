@@ -155,12 +155,9 @@ class Player {
   }
   kill(){
     this.isDead = true;
-    if(players.length === 1){
-      players.pop();
-    }else{
-      if(players.indexOf(this) < 0) return;
-      players.splice(players.indexOf(this), 1);
-    }
+    const index = players.indexOf(this);
+    if(index < 0) return;
+    players.splice(index, 1);
   }
 
   // onkeydown should be called every tick for each key that is down.
@@ -323,17 +320,22 @@ class Bomb {
                 }
               );
               if(playerDead){
+                this.player.killStreak ++;
+                player.kill();
                 mainEmitter.emit("kill", {
                   type: "kill",
                   data: {
                     killer: {
                       id: this.player.id,
-                      killStreak: this.player.killStreak
+                      killStreak: this.player.killStreak,
+                      username: this.player.username
                     },
-                    victim: player.username
+                    victim: {
+                      id: player.id,
+                      username: player.username
+                    }
                   }
                 });
-                player.kill();
               }
             });
             startX += mask[0] * blockWidth;
@@ -355,7 +357,7 @@ let height = 0;
 let mapResetDate;
 let isResetting;
 
-const resetMap = (newMap = "map3") => {
+const resetMap = (newMap = "map2") => {
   blocks = [];
   numBlocks = 0;
   const map = require("fs").readFileSync(__dirname + "/maps/" + newMap + ".txt").toString();
@@ -517,10 +519,11 @@ mainEmitter.on("ready", () => {
 
 mainEmitter.on("newUser", id => {
   let validLocation = false;
+  let player;
   while(!validLocation){
     const x = Math.round((Math.random() * (width - 2) + 1)) * blockWidth;
     const y = Math.round((Math.random() * (height - 2) + 1)) * blockWidth;
-    const player = new Player(x, y, blockWidth, blockWidth, id);
+    player = new Player(x, y, blockWidth, blockWidth, id);
     if(playerCollisionCheck(realCollisionBoxes(player))){
       validLocation = false;
     }else{
@@ -528,7 +531,8 @@ mainEmitter.on("newUser", id => {
       players.push(player);
     }
   }
-  mainEmitter.emit("userAdded", players[players.length - 1]);
+  console.log(players.map(player => ({x: player.x, y: player.y, username: player.username})));
+  mainEmitter.emit("userAdded", player);
 });
 
 mainEmitter.on("removeUser", id => {
@@ -555,7 +559,7 @@ const getEmitterFunc = (isKeyDown) => {
     };
 
     const key = map[data.key];
-    if(!key) console.log(data.key, "not recognized");
+    if(!key) console.log("unknown key", data.key, "not recognized");
     try {
       if(!keys[data.id]){
         keys[data.id] = {};
