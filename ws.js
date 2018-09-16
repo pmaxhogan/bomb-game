@@ -1,3 +1,11 @@
+const admin = require("firebase-admin");
+var serviceAccount = process.env.SERVICE_ACCOUNT ? JSON.parse(process.env.SERVICE_ACCOUNT) : require("./service-account-key.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+
 // the most time to wait for a pong before closing the connection.
 const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
 
@@ -57,6 +65,11 @@ const stringifyResponse = (players, bombs) => {
 
   return str;
 };
+
+const authenticate = (token) =>
+  admin.auth().verifyIdToken(token).then(user => {
+    return user;
+  });
 
 // Broadcast to all.
 wss.broadcast = function broadcast(...data) {
@@ -194,23 +207,39 @@ wss.on("connection", function connection(ws) {
     try{
       JSON.parse(data).forEach(data => {
         try{
+          const token = data.data && data.data.token;
           switch(data.type){
           case "hello":
-            ws.id = Math.floor(Math.random() * 32768);
-            send(
-              {
-                type: "map",
-                data: map
-              }, {
-                type: "playerinfo",
-                data: {
-                  id: ws.id
+            (async function() {
+
+              if(token){
+                try {
+                  ws.user = await authenticate(token);
+                  console.log("user:", ws.user);
+                } catch (e) {
+                  console.log("Invalid token", token, e);
+                  ws.close();
+                  return;
                 }
               }
-            );
 
-            console.log("hello new user!", ws.id);
-            mainEmitter.emit("newUser", ws.id);
+              ws.id = Math.floor(Math.random() * 32768);
+              send(
+                {
+                  type: "map",
+                  data: map
+                }, {
+                  type: "playerinfo",
+                  data: {
+                    id: ws.id
+                  }
+                }
+              );
+
+              console.log("hello new user!", ws.id);
+              mainEmitter.emit("newUser", ws.id);
+
+            })();
             break;
           case "keyDown":
             mainEmitter.emit("keyDown", {

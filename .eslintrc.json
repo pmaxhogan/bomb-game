@@ -22,5 +22,8 @@
             "always"
         ],
         "no-console": "off"
-    }
+    },
+  "parserOptions": {
+       "ecmaVersion": 2017
+   }
 }
