@@ -6,6 +6,7 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
+db.settings({timestampsInSnapshots: true});
 
 // the most time to wait for a pong before closing the connection.
 const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
@@ -225,7 +226,7 @@ wss.on("connection", function connection(ws) {
                 }
 
                 try {
-                  const ref = await db.collection("users").get(ws.user.uid);
+                  const ref = await db.collection("users").doc(ws.user.uid).get();
                   if(!ref.exists) throw new Error("Ref does not exist!");
                   data = ref.data();
                   console.log(data);
