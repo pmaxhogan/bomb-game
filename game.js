@@ -139,7 +139,7 @@ const userData = require("./users.json");
 const randUsername = () => userData.reduce((acc, row) => acc + row.data[Math.floor(Math.random() * row.data.length)], "");
 
 class Player {
-  constructor(x, y, width, height, id) {
+  constructor(x, y, width, height, id, username) {
     this.killStreak = 0;
     this.collisionBoxes = [[0, 0, width, height]];
     this.width = width;
@@ -150,7 +150,7 @@ class Player {
     this.id = id;
     this.direction = "up";
     this.shotCooldown = 0;
-    this.username = randUsername();
+    this.username = username || randUsername();
     this.lastShot = Date.now();
   }
   kill(){
@@ -517,13 +517,15 @@ mainEmitter.on("ready", () => {
   }, 1);
 });
 
-mainEmitter.on("newUser", id => {
+mainEmitter.on("newUser", obj => {
+  const id = obj.id;
+  const username = obj.username;
   let validLocation = false;
   let player;
   while(!validLocation){
     const x = Math.round((Math.random() * (width - 2) + 1)) * blockWidth;
     const y = Math.round((Math.random() * (height - 2) + 1)) * blockWidth;
-    player = new Player(x, y, blockWidth, blockWidth, id);
+    player = new Player(x, y, blockWidth, blockWidth, id, username);
     if(playerCollisionCheck(realCollisionBoxes(player))){
       validLocation = false;
     }else{

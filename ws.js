@@ -5,6 +5,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+const db = admin.firestore();
 
 // the most time to wait for a pong before closing the connection.
 const MAX_CONNECTION_BROKEN_WAIT = 5 * 1000;
@@ -211,6 +212,7 @@ wss.on("connection", function connection(ws) {
           switch(data.type){
           case "hello":
             (async function() {
+              let username;
 
               if(token){
                 try {
@@ -220,6 +222,16 @@ wss.on("connection", function connection(ws) {
                   console.log("Invalid token", token, e);
                   ws.close();
                   return;
+                }
+
+                try {
+                  const ref = await db.collection("users").get(ws.user.uid);
+                  if(!ref.exists) throw new Error("Ref does not exist!");
+                  data = ref.data();
+                  console.log(data);
+                  username = data.username;
+                } catch (e) {
+                  console.error("Could not get username for user", ws.user.uid, e);
                 }
               }
 
@@ -236,8 +248,8 @@ wss.on("connection", function connection(ws) {
                 }
               );
 
-              console.log("hello new user!", ws.id);
-              mainEmitter.emit("newUser", ws.id);
+              console.log("hello new user!", ws.id, username);
+              mainEmitter.emit("newUser", {id: ws.id, username});
 
             })();
             break;
