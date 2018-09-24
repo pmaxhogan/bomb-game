@@ -40,7 +40,7 @@ const convertBase = (value, from_base, to_base) => {
   return new_value || "0";
 };
 
-const stringifyResponse = (players, bombs) => {
+const stringifyResponse = (players, bombs, bullets) => {
   let str = "";
 
   str += players.reduce((str, player) => {
@@ -65,6 +65,14 @@ const stringifyResponse = (players, bombs) => {
     return str;
   }, "");
 
+  str += bullets.reduce((str, bullet) => {
+    if(bullet.x < 0 || bullet.y < 0) return;
+    str += ".";
+    str += convertBase(Math.floor(bullet.x), 10, 64) + "=";
+    str += convertBase(Math.floor(bullet.y), 10, 64);
+    return str;
+  }, "");
+
   return str;
 };
 
@@ -86,6 +94,7 @@ wss.broadcast = function broadcast(...data) {
 let map;
 let players;
 let bombs;
+let bullets;
 
 mainEmitter.emit("ready");
 
@@ -103,6 +112,7 @@ mainEmitter.on("players", newPlayers => {
   players = newPlayers;
 });
 mainEmitter.on("bombs", newbombs => bombs = newbombs);
+mainEmitter.on("bullets", newbullets => bullets = newbullets);
 
 let tickCounter = 0;
 
@@ -132,7 +142,7 @@ let lastResponse;
 mainEmitter.on("tick", () => {
   if(!players) return;
 
-  let response = stringifyResponse(players, bombs);
+  let response = stringifyResponse(players, bombs, bullets);
 
   if(response === lastResponse) return;
 
@@ -268,6 +278,9 @@ wss.on("connection", function connection(ws) {
             break;
           case "bomb":
             mainEmitter.emit("bomb", ws.id);
+            break;
+          case "bullet":
+            mainEmitter.emit("bullet", ws.id);
             break;
           default:
             throw new Error("Unknown WS protocol type", data.type);

@@ -13,6 +13,8 @@ const mainEmitter = new __MyEmitter();
 let speed = 5;
 
 const blockWidth = 20;
+const bulletSize = 5;
+const bulletSpeed = 20;
 const bombSize = 10;
 const bombSpeed = 20;
 const maxShotCooldown = 375;// ms
@@ -152,6 +154,7 @@ class Player {
     this.shotCooldown = 0;
     this.username = username || randUsername();
     this.lastShot = Date.now();
+    this.lastBomb = Date.now();
   }
   kill(){
     this.isDead = true;
@@ -179,14 +182,22 @@ class Player {
   }
 
   bomb(){
-    if(Date.now() - this.lastShot < maxShotCooldown) return log("Cooldown!");
-    this.lastShot = Date.now();
+    if(Date.now() - this.lastBomb < maxShotCooldown) return log("Cooldown!");
+    this.lastBomb = Date.now();
     log("bomb");
     const x = roundToTheNearest(this.x, blockWidth);
     const y = roundToTheNearest(this.y, blockWidth);
     if(bombs.some(bomb => bomb.x === x && bomb.y === y)) return log("already there!");
     bombs.push(new Bomb(x, y, this));
   }
+
+  shoot(){
+    if(Date.now() - this.lastShot < maxShotCooldown) return;
+    this.lastShot = Date.now();
+    log("shoot");
+    bullets.push(new Bullet(this.x + this.width / 2, this.y + this.height / 2, this.direction, this));
+  }
+
 
   get x() {
     return this.realX;
@@ -220,6 +231,122 @@ class Player {
     return newVal;
   }
 }
+
+const bulletOnCoordChange = (bullet, isX, newVal) => {
+  let mapped;
+  if(isX){
+    mapped = clone(bullet.collisionBoxes).map(box => {
+      box[0] += newVal;
+      box[1] += bullet.realY;
+      return box;
+    });
+  }else{
+    mapped = clone(bullet.collisionBoxes).map(box => {
+      box[0] += bullet.realX;
+      box[1] += newVal;
+      return box;
+    });
+  }
+
+  let joined = players.concat(blocks);
+
+  const collision = playerCollisionCheck(mapped, joined);
+
+  if(collision){
+    if(collision instanceof Player){
+      if(bullet.player !== collision){
+        bullet.player.killStreak ++;
+        collision.kill();
+        bullet.remove();
+        mainEmitter.emit("kill", {
+          type: "kill",
+          data: {
+            killer: {
+              id: bullet.player.id,
+              killStreak: bullet.player.killStreak
+            },
+            victim: collision.username
+          }
+        });
+        return newVal;
+      }else{
+        log("Bullet hit owner.");
+      }
+    }else{
+      bullet.remove();
+      return newVal;
+    }
+  }
+  if(isX){
+    bullet.realX = newVal;
+  }else{
+    bullet.realY = newVal;
+  }
+  return newVal;
+};
+
+class Bullet{
+  constructor(x, y, direction, player){
+    this.realX = x;
+    this.realY = y;
+    this.size = bulletSize;
+    this.direction = direction;
+    this.speed = bulletSpeed;
+    this.fillColor = player.fillColor;
+    this.collisionBoxes = [[-this.size / 2, -this.size / 2, this.size / 2, this.size / 2]];
+    this.player = player;
+  }
+  draw(){
+    if(this.player.isDead) return this.remove();
+
+    if(this.x <= 0 || this.y <= 0 || this.x > (width * blockWidth) + 100  || this.y > (height * blockWidth) + 100){
+      return this.remove();
+    }
+
+    switch(this.direction){
+    case "up":
+      this.y -= bulletSpeed;
+      break;
+    case "down":
+      this.y += bulletSpeed;
+      break;
+    case "left":
+      this.x -= bulletSpeed;
+      break;
+    case "right":
+      this.x += bulletSpeed;
+      break;
+    default:
+      throw this;
+    }
+  }
+
+  remove(){
+    log("remove");
+    if(bullets.length === 1){
+      bullets.pop();
+    }else{
+      bullets.splice(bullets.indexOf(this), 1);
+    }
+  }
+
+  get x() {
+    return this.realX;
+  }
+
+  get y() {
+    return this.realY;
+  }
+
+  set x(newVal) {
+    return bulletOnCoordChange(this, true, newVal);
+  }
+
+  set y(newVal) {
+    return bulletOnCoordChange(this, false, newVal);
+  }
+}
+
 
 class Bomb {
   constructor(x, y, player){
@@ -433,6 +560,7 @@ const drawNoise = (x, y, w, h, density) => {
 // drawNoise(1, 1, width - 2, height - 2, 0.1);
 
 const bombs = [];
+const bullets = [];
 
 
 const _cache = {};
@@ -497,6 +625,7 @@ const draw = () => {
     }
   });
   bombs.forEach(bomb => bomb.draw());
+  bullets.forEach(bullet => bullet.draw());
 
   isRunning = false;
 
@@ -514,6 +643,7 @@ mainEmitter.on("ready", () => {
     });
     mainEmitter.emit("players", players);
     mainEmitter.emit("bombs", bombs);
+    mainEmitter.emit("bullets", bullets);
   }, 1);
 });
 
@@ -580,4 +710,9 @@ mainEmitter.on("keyUp", getEmitterFunc(false));
 mainEmitter.on("bomb", data => {
   const player = getPlayerById(data);
   if(player) player.bomb();
+});
+
+mainEmitter.on("shoot", data => {
+  const player = getPlayerById(data);
+  if(player) player.shoot();
 });
