@@ -279,8 +279,9 @@ wss.on("connection", function connection(ws) {
           case "bomb":
             mainEmitter.emit("bomb", ws.id);
             break;
-          case "bullet":
-            mainEmitter.emit("bullet", ws.id);
+          case "shoot":
+            console.log("shoot");
+            mainEmitter.emit("shoot", ws.id);
             break;
           default:
             throw new Error("Unknown WS protocol type", data.type);
