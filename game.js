@@ -44,14 +44,16 @@ const isCollision = (rect1, rect2) => {
 };
 
 class Block {
-  constructor(x, y, width, height) {
+  constructor(x, y, width, height, canBeDestroyed) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
     this.collisionBoxes = [[0, 0, width, height]];
+    this.canBeDestroyed = canBeDestroyed;
   }
   destroy(){
+    if(!this.canBeDestroyed) return;
     console.log("removing block");
     if(this.x === 0 || this.y === 0 || this.x === (width - 1) * blockWidth || this.y === (height - 1) * blockWidth){//on the edge of the map
       return false;
@@ -287,6 +289,7 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
 
 class Bullet{
   constructor(x, y, direction, player){
+    console.log("new bullet @", x, y, "by", player.username);
     this.realX = x;
     this.realY = y;
     this.size = bulletSize;
@@ -484,7 +487,7 @@ let height = 0;
 let mapResetDate;
 let isResetting;
 
-const resetMap = (newMap = "map3") => {
+const resetMap = (newMap = "map4") => {
   blocks = [];
   numBlocks = 0;
   const map = require("fs").readFileSync(__dirname + "/maps/" + newMap + ".txt").toString();
@@ -495,10 +498,10 @@ const resetMap = (newMap = "map3") => {
 
   split.forEach((line, lineNumber) => {
     line.split("").forEach((char, idx) => {
-      if(char === "#"){
+      if(char === "#" || char === "M"){
         log(idx, lineNumber);
         numBlocks ++;
-        blocks.push(new Block(idx * blockWidth, lineNumber * blockWidth, blockWidth, blockWidth));
+        blocks.push(new Block(idx * blockWidth, lineNumber * blockWidth, blockWidth, blockWidth, char === "M"));
       }
     });
   });
@@ -714,5 +717,6 @@ mainEmitter.on("bomb", data => {
 
 mainEmitter.on("shoot", data => {
   const player = getPlayerById(data);
+  console.log("shooting for player", data);
   if(player) player.shoot();
 });
