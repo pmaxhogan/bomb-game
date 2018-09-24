@@ -614,8 +614,9 @@ const draw = () => {
       }
     });
 
+    const newBlocks = blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height, block.canBeDestroyed]]), []);
     mainEmitter.emit("map", {
-      blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
+      blocks: newBlocks
     });
     mainEmitter.emit("mapReset");
   }
@@ -642,7 +643,7 @@ module.exports = mainEmitter;
 mainEmitter.on("ready", () => {
   setTimeout(() => {
     mainEmitter.emit("map", {
-      blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height]]), [])
+      blocks: blocks.reduce((acc, block) => acc.concat([[block.x, block.y, block.width, block.height, block.canBeDestroyed]]), [])
     });
     mainEmitter.emit("players", players);
     mainEmitter.emit("bombs", bombs);
