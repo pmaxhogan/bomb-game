@@ -316,6 +316,7 @@ wss.on("connection", function connection(ws) {
 setInterval(function ping() {
   wss.clients.forEach(function each(ws) {
     if (ws.isAlive === false || ws.readyState === WebSocket.CLOSING || ws.readyState === WebSocket.CLOSED){
+      console.log("heartbeat failed");
       if(ws.id) mainEmitter.emit("removeUser", ws.id);
       return ws.terminate();
     }

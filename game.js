@@ -265,9 +265,14 @@ const bulletOnCoordChange = (bullet, isX, newVal) => {
           data: {
             killer: {
               id: bullet.player.id,
-              killStreak: bullet.player.killStreak
+              killStreak: bullet.player.killStreak,
+              username: bullet.player.username
             },
-            victim: collision.username
+            victim: {
+              id: collision.id,
+              killStreak: collision.killStreak,
+              username: collision.username
+            }
           }
         });
         return newVal;
