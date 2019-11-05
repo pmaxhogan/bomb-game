@@ -492,7 +492,8 @@ let height = 0;
 let mapResetDate;
 let isResetting;
 
-const resetMap = (newMap = "map4") => {
+const resetMap = (newMap="map1") => {
+  
   blocks = [];
   numBlocks = 0;
   const map = require("fs").readFileSync(__dirname + "/maps/" + newMap + ".txt").toString();
